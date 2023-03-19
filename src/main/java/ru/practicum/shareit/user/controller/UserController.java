@@ -3,19 +3,17 @@ package ru.practicum.shareit.user.controller;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
+import ru.practicum.shareit.validation.Create;
+import ru.practicum.shareit.validation.Update;
 
-import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 
-/**
- * TODO Sprint add-controllers.
- */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/users")
@@ -27,18 +25,18 @@ public class UserController {
 
     @GetMapping
     public List<UserDto> findAll() {
-        return changeListFromUserToDto(userService.findAll());
+        return userMapper.changeListFromUserToDto(userService.findAll());
     }
 
     @PostMapping
-    public UserDto create(@Valid @RequestBody UserDto user) {
+    public UserDto create(@Validated(Create.class) @RequestBody UserDto user) {
         User newUser = userMapper.fromDtoToUser(user);
         User createdUser = userService.create(newUser);
         return userMapper.fromUserToDto(createdUser);
     }
 
     @PatchMapping("/{userId}")
-    public UserDto update(@PathVariable("userId") Long userId, @RequestBody UserDto user) {
+    public UserDto update(@PathVariable("userId") Long userId, @Validated(Update.class) @RequestBody UserDto user) {
         User newUser = userMapper.fromDtoToUser(user);
         User updatedUser = userService.update(newUser, userId);
         return userMapper.fromUserToDto(updatedUser);
@@ -60,11 +58,4 @@ public class UserController {
         userService.deleteAll();
     }
 
-    private List<UserDto> changeListFromUserToDto(List<User> users) {
-        List<UserDto> dtos = new ArrayList<>();
-        for (User user : users) {
-            dtos.add(userMapper.fromUserToDto(user));
-        }
-        return dtos;
-    }
 }

@@ -5,14 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import ru.practicum.shareit.validation.Create;
+import ru.practicum.shareit.validation.Update;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-/**
- * TODO Sprint add-controllers.
- */
 
 @Data
 @NoArgsConstructor
@@ -20,11 +18,11 @@ import javax.validation.constraints.Size;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ItemDto {
     Long id;
-    @NotBlank(message = "Имя не может быть пустым. Попробуйте еще раз.")
+    @NotBlank(groups = {Create.class}, message = "Имя не может быть пустым. Попробуйте еще раз.")
     String name;
-    @NotBlank(message = "Описание не может быть пустым. Попробуйте еще раз.")
-    @Size(max = 200, message = "Максимальная длина описания составляет 200 символов")
+    @NotBlank(groups = {Create.class}, message = "Описание не может быть пустым. Попробуйте еще раз.")
+    @Size(groups = {Create.class, Update.class}, max = 200, message = "Максимальная длина описания составляет 200 символов")
     String description;
-    @NotNull
+    @NotNull(groups = {Create.class})
     Boolean available;
 }

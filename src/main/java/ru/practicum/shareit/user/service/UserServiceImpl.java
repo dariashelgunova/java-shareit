@@ -10,10 +10,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repo.UserRepo;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,15 +23,14 @@ public class UserServiceImpl implements UserService {
     }
 
     public User create(User user) {
-        if (isEmailAlreadyOccupied(user))
-            throw new ValidationException("Данный адрес электронной почты уже присутствует в базе.");
+        isEmailAlreadyOccupied(user);
         return userRepo.create(user);
     }
 
     public User update(User newUser, Long userId) {
         User oldUser = getUserByIdOrThrowException(userId);
         newUser.setId(userId);
-        return userRepo.update(changeUserFields(oldUser, newUser));
+        return changeUserFields(oldUser, newUser);
     }
 
     public User findById(Long userId) {
@@ -54,39 +50,22 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new NotFoundObjectException("Объект не был найден"));
     }
 
-    private boolean isEmailAlreadyOccupied(User userToCheck) {
-        Map<Long, User> users = userRepo.findAll()
+    private void isEmailAlreadyOccupied(User userToCheck) {
+        userRepo.findAll()
                 .stream()
-                .collect(Collectors.toMap(User::getId, Function.identity()));
-
-        String userToCheckEmail = userToCheck.getEmail();
-        boolean isNew = true;
-        if (userToCheck.getId() == null || users.containsKey(userToCheck.getId())) {
-            for (User currentUser : users.values()) {
-                if (userToCheckEmail.equals(currentUser.getEmail()) &&
-                        !Objects.equals(currentUser.getId(), userToCheck.getId())) {
-                    isNew = false;
-                    break;
-                }
-            }
-        }
-        return !isNew;
+                .filter(u -> !Objects.equals(u.getId(), userToCheck.getId()) && userToCheck.getEmail().equals(u.getEmail()))
+                .findFirst()
+                .ifPresent((u) -> {throw new ValidationException("Данный адрес электронной почты уже присутствует в базе.");});
     }
 
     private User changeUserFields(User oldUser, User newUser) {
-        if (newUser.getEmail() != null) {
-            if (isEmailAlreadyOccupied(newUser))
-                throw new ValidationException("Данный адрес электронной почты уже присутствует в базе.");
+        if (newUser.getEmail() != null && !newUser.getEmail().isBlank()) {
+            isEmailAlreadyOccupied(newUser);
+
             oldUser.setEmail(newUser.getEmail());
         }
-        if (newUser.getName() != null) {
+        if (newUser.getName() != null && !newUser.getName().isBlank()) {
             oldUser.setName(newUser.getName());
-        }
-        if (newUser.getLogin() != null) {
-            oldUser.setLogin(newUser.getLogin());
-        }
-        if (newUser.getBirthday() != null) {
-            oldUser.setBirthday(newUser.getBirthday());
         }
         return oldUser;
     }

@@ -24,15 +24,6 @@ public class UserRepoInMemory implements UserRepo {
         return user;
     }
 
-    public User update(User user) {
-        User oldUser = repo.get(user.getId());
-        oldUser.setName(user.getName());
-        oldUser.setLogin(user.getLogin());
-        oldUser.setEmail(user.getEmail());
-        oldUser.setBirthday(user.getBirthday());
-        return repo.get(user.getId());
-    }
-
     public Optional<User> findById(Long userId) {
         return Optional.ofNullable(repo.get(userId));
     }

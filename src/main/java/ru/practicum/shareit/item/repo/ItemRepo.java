@@ -10,11 +10,10 @@ public interface ItemRepo {
 
     Item create(Item item);
 
-    Item update(Item item);
-
     Optional<Item> findById(Long itemId);
 
     void deleteById(Long itemId);
 
     void deleteAll();
+    List<Item> findItemsByOwner(Long ownerId);
 }

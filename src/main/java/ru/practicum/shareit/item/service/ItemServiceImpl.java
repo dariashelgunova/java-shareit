@@ -37,7 +37,7 @@ public class ItemServiceImpl implements ItemService {
     public Item update(Item newItem, Long ownerId, Long itemId) {
         if (Objects.equals(getItemByIdOrThrowException(itemId).getOwner().getId(), ownerId)) {
             Item oldItem = getItemByIdOrThrowException(itemId);
-            return itemRepo.update(changeItemFields(oldItem, newItem));
+            return changeItemFields(oldItem, newItem);
         } else {
             throw new AccessDeniedException("Только собственник может редактировать вещь!");
         }
@@ -57,10 +57,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     public List<Item> findItemsByOwner(Long ownerId) {
-        return itemRepo.findAll()
-                .stream()
-                .filter(o -> Objects.equals(o.getOwner().getId(), ownerId))
-                .collect(Collectors.toList());
+        return itemRepo.findItemsByOwner(ownerId);
     }
 
     public List<Item> findItemsBySearch(String requestText) {
@@ -84,10 +81,10 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private Item changeItemFields(Item oldItem, Item newItem) {
-        if (newItem.getName() != null) {
+        if (newItem.getName() != null && !newItem.getName().isBlank()) {
             oldItem.setName(newItem.getName());
         }
-        if (newItem.getDescription() != null) {
+        if (newItem.getDescription() != null && !newItem.getDescription().isBlank()) {
             oldItem.setDescription(newItem.getDescription());
         }
         if (newItem.getAvailable() != null) {

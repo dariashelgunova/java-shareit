@@ -11,6 +11,7 @@ import java.util.*;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ItemRepoInMemory implements ItemRepo {
     final Map<Long, Item> repo = new HashMap<>();
+    final Map<Long, List<Item>> userItemIndex = new LinkedHashMap<>();
     Long idCounter = 0L;
 
     public List<Item> findAll() {
@@ -20,15 +21,10 @@ public class ItemRepoInMemory implements ItemRepo {
     public Item create(Item item) {
         item.setId(++idCounter);
         repo.put(idCounter, item);
+        final List<Item> items = userItemIndex.computeIfAbsent(item.getOwner().getId(), k -> new ArrayList<>());
+        items.add(item);
+        userItemIndex.put(item.getOwner().getId(), items);
         return item;
-    }
-
-    public Item update(Item item) {
-        Item oldItem = repo.get(item.getId());
-        oldItem.setName(item.getName());
-        oldItem.setDescription(item.getDescription());
-        oldItem.setAvailable(item.getAvailable());
-        return oldItem;
     }
 
     public Optional<Item> findById(Long itemId) {
@@ -41,6 +37,10 @@ public class ItemRepoInMemory implements ItemRepo {
 
     public void deleteAll() {
         repo.clear();
+    }
+
+    public List<Item> findItemsByOwner(Long ownerId) {
+        return userItemIndex.get(ownerId);
     }
 
 }

@@ -1,17 +1,15 @@
 package ru.practicum.shareit.user.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.format.annotation.DateTimeFormat;
+import ru.practicum.shareit.validation.Create;
+import ru.practicum.shareit.validation.Update;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.PastOrPresent;
-import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
@@ -19,13 +17,10 @@ import java.time.LocalDate;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserDto {
     Long id;
-    @NotBlank(message = "Адрес электронной почты отсутствует. Попробуйте еще раз.")
-    @Email(message = "Необходимо ввести электронную почту в соответствующем формате. Например - name@gmail.com")
+    @NotBlank(groups = {Create.class}, message = "Адрес электронной почты отсутствует. Попробуйте еще раз.")
+    @Email(groups = {Create.class, Update.class}, message = "Необходимо ввести электронную почту в соответствующем формате. Например - name@gmail.com")
     String email;
-    String login;
+    @NotBlank(groups = {Create.class}, message = "Имя пользователя отсутствует. Попробуйте еще раз.")
     String name;
-    @PastOrPresent(message = "Дата рождения не может относиться к будущему.")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    LocalDate birthday;
+
 }

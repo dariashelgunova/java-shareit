@@ -10,8 +10,6 @@ public interface UserRepo {
 
     User create(User user);
 
-    User update(User user);
-
     Optional<User> findById(Long userId);
 
     void deleteById(Long userId);
