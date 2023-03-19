@@ -15,5 +15,6 @@ public interface ItemRepo {
     void deleteById(Long itemId);
 
     void deleteAll();
+
     List<Item> findItemsByOwner(Long ownerId);
 }

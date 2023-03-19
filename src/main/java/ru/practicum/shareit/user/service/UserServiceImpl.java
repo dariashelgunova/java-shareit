@@ -53,9 +53,12 @@ public class UserServiceImpl implements UserService {
     private void isEmailAlreadyOccupied(User userToCheck) {
         userRepo.findAll()
                 .stream()
-                .filter(u -> !Objects.equals(u.getId(), userToCheck.getId()) && userToCheck.getEmail().equals(u.getEmail()))
+                .filter(u -> !Objects.equals(u.getId(), userToCheck.getId()) &&
+                        userToCheck.getEmail().equals(u.getEmail()))
                 .findFirst()
-                .ifPresent((u) -> {throw new ValidationException("Данный адрес электронной почты уже присутствует в базе.");});
+                .ifPresent((u) -> {
+                    throw new ValidationException("Данный адрес электронной почты уже присутствует в базе.");
+                });
     }
 
     private User changeUserFields(User oldUser, User newUser) {
