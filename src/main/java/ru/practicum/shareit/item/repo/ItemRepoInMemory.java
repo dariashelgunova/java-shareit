@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.repo;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Repository;
+import ru.practicum.shareit.exception.NotFoundObjectException;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.*;
@@ -32,11 +33,22 @@ public class ItemRepoInMemory implements ItemRepo {
     }
 
     public void deleteById(Long itemId) {
-        repo.remove(itemId);
+        if (repo.containsKey(itemId)) {
+            Item item = repo.get(itemId);
+            Long ownerId = item.getOwner().getId();
+            List<Item> itemsByUser = userItemIndex.get(ownerId);
+            itemsByUser.remove(item);
+            userItemIndex.put(ownerId, itemsByUser);
+
+            repo.remove(itemId);
+        } else {
+            throw new NotFoundObjectException("Данного объекта нет в базе.");
+        }
     }
 
     public void deleteAll() {
         repo.clear();
+        userItemIndex.clear();
     }
 
     public List<Item> findItemsByOwner(Long ownerId) {

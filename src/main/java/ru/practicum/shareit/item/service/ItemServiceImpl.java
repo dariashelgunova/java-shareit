@@ -35,8 +35,8 @@ public class ItemServiceImpl implements ItemService {
     }
 
     public Item update(Item newItem, Long ownerId, Long itemId) {
-        if (Objects.equals(getItemByIdOrThrowException(itemId).getOwner().getId(), ownerId)) {
-            Item oldItem = getItemByIdOrThrowException(itemId);
+        Item oldItem = getItemByIdOrThrowException(itemId);
+        if (Objects.equals(oldItem.getOwner().getId(), ownerId)) {
             return changeItemFields(oldItem, newItem);
         } else {
             throw new AccessDeniedException("Только собственник может редактировать вещь!");
