@@ -34,13 +34,10 @@ public class ItemRepoInMemory implements ItemRepo {
 
     public void deleteById(Long itemId) {
         if (repo.containsKey(itemId)) {
-            Item item = repo.get(itemId);
+            Item item = repo.remove(itemId);
             Long ownerId = item.getOwner().getId();
             List<Item> itemsByUser = userItemIndex.get(ownerId);
             itemsByUser.remove(item);
-            userItemIndex.put(ownerId, itemsByUser);
-
-            repo.remove(itemId);
         } else {
             throw new NotFoundObjectException("Данного объекта нет в базе.");
         }
