@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 @Component
 public class UserMapper {
     public User fromDtoToUser(UserDto userDto) {
+        if (userDto == null) return null;
+
         User user = new User();
         user.setId(userDto.getId());
         user.setName(userDto.getName());
@@ -19,6 +21,8 @@ public class UserMapper {
     }
 
     public UserDto fromUserToDto(User user) {
+        if (user == null) return null;
+
         UserDto userDto = new UserDto();
         userDto.setId(user.getId());
         userDto.setName(user.getName());
@@ -28,6 +32,8 @@ public class UserMapper {
     }
 
     public List<UserDto> changeListFromUserToDto(List<User> users) {
+        if (users == null) return null;
+
         return users
                 .stream()
                 .map(this::fromUserToDto)

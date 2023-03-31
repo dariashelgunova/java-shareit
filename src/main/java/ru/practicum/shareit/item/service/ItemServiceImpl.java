@@ -5,10 +5,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.State;
+import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exception.AccessDeniedException;
+import ru.practicum.shareit.exception.AvailabilityException;
 import ru.practicum.shareit.exception.NotFoundObjectException;
+import ru.practicum.shareit.item.comment.model.Comment;
+import ru.practicum.shareit.item.comment.repo.CommentRepoInDb;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.repo.ItemRepo;
+import ru.practicum.shareit.item.repo.ItemRepoInDb;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -21,8 +27,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ItemServiceImpl implements ItemService {
-    ItemRepo itemRepo;
+    ItemRepoInDb itemRepo;
     UserService userService;
+    CommentRepoInDb commentRepo;
+    BookingService bookingService;
 
     public List<Item> findAll() {
         return itemRepo.findAll();
@@ -31,13 +39,13 @@ public class ItemServiceImpl implements ItemService {
     public Item create(Item newItem, Long ownerId) {
         User owner = userService.findById(ownerId);
         newItem.setOwner(owner);
-        return itemRepo.create(newItem);
+        return itemRepo.save(newItem);
     }
 
     public Item update(Item newItem, Long ownerId, Long itemId) {
         Item oldItem = getItemByIdOrThrowException(itemId);
         if (Objects.equals(oldItem.getOwner().getId(), ownerId)) {
-            return changeItemFields(oldItem, newItem);
+            return itemRepo.save(changeItemFields(oldItem, newItem));
         } else {
             throw new AccessDeniedException("Только собственник может редактировать вещь!");
         }
@@ -57,7 +65,15 @@ public class ItemServiceImpl implements ItemService {
     }
 
     public List<Item> findItemsByOwner(Long ownerId) {
-        return itemRepo.findItemsByOwner(ownerId);
+        List<Item> result =  itemRepo.findAll()
+                .stream()
+                .filter(o -> Objects.equals(o.getOwner().getId(), ownerId))
+                .collect(Collectors.toList());
+        if (result.isEmpty()) {
+            throw new NotFoundObjectException("По вашему запросу ничего найдено.");
+        } else {
+            return result;
+        }
     }
 
     public List<Item> findItemsBySearch(String requestText) {
@@ -72,6 +88,19 @@ public class ItemServiceImpl implements ItemService {
             throw new NotFoundObjectException("По вашему запросу ничего найдено.");
         } else {
             return result;
+        }
+    }
+
+    public Comment addComment(Long itemId, Long userId, Comment newComment) {
+        List<Booking> result = bookingService.findBookingsByUserForComment(userId, State.PAST)
+                .stream()
+                .filter(b -> b.getItem().getId().equals(itemId))
+                .collect(Collectors.toList());
+
+        if (!result.isEmpty()) {
+            return commentRepo.save(newComment);
+        } else {
+            throw new AvailabilityException("Пользователь еще не брал в аренду данную вещь и не может оставить комментарий!");
         }
     }
 
@@ -92,4 +121,6 @@ public class ItemServiceImpl implements ItemService {
         }
         return oldItem;
     }
+
+
 }

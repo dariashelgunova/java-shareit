@@ -22,6 +22,12 @@ public class ControllerExceptionHandler {
         return buildErrorResponse(BAD_REQUEST, ex.getMessage());
     }
 
+    @ExceptionHandler(value = ValidationException.class)
+    public ResponseEntity<ErrorDetails> handleOwnValidationException(ValidationException ex) {
+        log.debug(String.valueOf(ex));
+        return buildErrorResponse(BAD_REQUEST, ex.getMessage());
+    }
+
     @ExceptionHandler(value = AccessDeniedException.class)
     public ResponseEntity<ErrorDetails> handleAccessDeniedException(AccessDeniedException ex) {
         log.debug(String.valueOf(ex));
@@ -46,16 +52,34 @@ public class ControllerExceptionHandler {
         return buildErrorResponse(BAD_REQUEST, ex.getMessage());
     }
 
-    @ExceptionHandler(value = Throwable.class)
-    public ResponseEntity<ErrorDetails> handleUncheckedException(Throwable ex) {
-        log.debug(String.valueOf(ex));
-        return buildErrorResponse(INTERNAL_SERVER_ERROR, ex.getMessage());
-    }
+//    @ExceptionHandler(value = Throwable.class)
+//    public ResponseEntity<ErrorDetails> handleUncheckedException(Throwable ex) {
+//        log.debug(String.valueOf(ex));
+//        return buildErrorResponse(INTERNAL_SERVER_ERROR, ex.getMessage());
+//    }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorDetails> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         log.debug(String.valueOf(ex));
         return buildErrorResponse(BAD_REQUEST, getErrorDescription(ex));
+    }
+
+    @ExceptionHandler(value = AvailabilityException.class)
+    public ResponseEntity<ErrorDetails> handleAvailabilityException(AvailabilityException ex) {
+        log.debug(String.valueOf(ex));
+        return buildErrorResponse(BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(value = InvalidBookingStateException.class)
+    public ResponseEntity<ErrorDetails> handleInvalidBookingStateException(InvalidBookingStateException ex) {
+        log.debug(String.valueOf(ex));
+        return buildErrorResponse(BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(value = ApproveBookingException.class)
+    public ResponseEntity<ErrorDetails> handleApproveBookingException(ApproveBookingException ex) {
+        log.debug(String.valueOf(ex));
+        return buildErrorResponse(NOT_FOUND, ex.getMessage());
     }
 
     private String getErrorDescription(MethodArgumentNotValidException fieldErrors) {
@@ -68,4 +92,5 @@ public class ControllerExceptionHandler {
         ErrorDetails error = new ErrorDetails(status.value(), message);
         return new ResponseEntity<>(error, status);
     }
+
 }
