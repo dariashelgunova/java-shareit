@@ -17,9 +17,7 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BookingDtoToReturn {
     Long id;
-    //@JsonFormat(pattern = "YYYY-mm-dd'T'hh:MM:ss")
     LocalDateTime start;
-    //@JsonFormat(pattern = "YYYY-mm-dd'T'hh:MM:ss")
     LocalDateTime end;
     Item item;
     User booker;

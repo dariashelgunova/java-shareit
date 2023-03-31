@@ -16,7 +16,7 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="requests")
+@Table(name = "requests")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ItemRequest {
     @Id

@@ -19,11 +19,9 @@ public class BookingDto {
     Long id;
     @FutureOrPresent(message = "Дата и время окончания не могут относиться к прошлому. Попробуйте еще раз.")
     @NotNull(message = "Дата и время начала не могут быть пустыми. Попробуйте еще раз.")
-    //@JsonFormat(pattern = "YYYY-mm-dd'T'hh:MM:ss")
     LocalDateTime start;
     @FutureOrPresent(message = "Дата и время окончания не могут относиться к прошлому. Попробуйте еще раз.")
     @NotNull(message = "Дата и время окончания не могут быть пустыми. Попробуйте еще раз.")
-    //@JsonFormat(pattern = "YYYY-mm-dd'T'hh:MM:ss")
     LocalDateTime end;
     Long itemId;
     Long bookerId;

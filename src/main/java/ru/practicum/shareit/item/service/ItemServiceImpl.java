@@ -65,7 +65,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     public List<Item> findItemsByOwner(Long ownerId) {
-        List<Item> result =  itemRepo.findAll()
+        List<Item> result = itemRepo.findAll()
                 .stream()
                 .filter(o -> Objects.equals(o.getOwner().getId(), ownerId))
                 .collect(Collectors.toList());
@@ -78,7 +78,7 @@ public class ItemServiceImpl implements ItemService {
 
     public List<Item> findItemsBySearch(String requestText) {
         if (StringUtils.isBlank(requestText)) return Collections.emptyList();
-        List<Item> result =  itemRepo.findAll()
+        List<Item> result = itemRepo.findAll()
                 .stream()
                 .filter(o -> (o.getName().toLowerCase().contains(requestText.toLowerCase())
                         || o.getDescription().toLowerCase().contains(requestText.toLowerCase()))

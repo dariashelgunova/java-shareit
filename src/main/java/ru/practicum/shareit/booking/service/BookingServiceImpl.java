@@ -12,7 +12,6 @@ import ru.practicum.shareit.exception.ApproveBookingException;
 import ru.practicum.shareit.exception.AvailabilityException;
 import ru.practicum.shareit.exception.NotFoundObjectException;
 import ru.practicum.shareit.exception.ValidationException;
-import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -26,10 +25,9 @@ import java.util.stream.Collectors;
 public class BookingServiceImpl implements BookingService {
 
     BookingRepoInDb bookingRepoInDb;
-    UserService userService;
+
     public Booking create(Booking booking, Long userId) {
         booking.setStatus(Status.WAITING);
-        //User booker = userService.findById(userId);
         if (!booking.getItem().getAvailable()) {
             throw new AvailabilityException("Данная вещь недоступна для аренды!");
         } else if (booking.getEnd().isBefore(booking.getStart())) {
@@ -41,7 +39,6 @@ public class BookingServiceImpl implements BookingService {
         } else {
             return bookingRepoInDb.save(booking);
         }
-        //booking.setBooker(booker);
     }
 
     public Booking acceptOrRejectRequest(boolean approved, Long userId, Long bookingId) {
@@ -76,8 +73,6 @@ public class BookingServiceImpl implements BookingService {
         if (booking == null) {
             return false;
         }
-//        return (userId.equals(booking.getItem().getOwner().getId()) ||
-//                userId.equals(booking.getBooker().getId()));
         return userId.equals(booking.getItem().getOwner().getId());
     }
 
@@ -117,7 +112,7 @@ public class BookingServiceImpl implements BookingService {
         List<Booking> result = new ArrayList<>();
         LocalDateTime currentTime = LocalDateTime.from(LocalDateTime.now());
 
-        switch(state) {
+        switch (state) {
             case CURRENT:
                 result = bookingRepoInDb.findByStartBeforeAndEndAfterOrderByStartDesc(currentTime, currentTime);
                 break;

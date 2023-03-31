@@ -21,7 +21,6 @@ public class UserServiceImpl implements UserService {
     }
 
     public User create(User user) {
-//        isEmailAlreadyOccupied(user);
         return userRepo.save(user);
     }
 
@@ -48,20 +47,8 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new NotFoundObjectException("Объект не был найден"));
     }
 
-//    private void isEmailAlreadyOccupied(User userToCheck) {
-//        userRepo.findAll()
-//                .stream()
-//                .filter(u -> !Objects.equals(u.getId(), userToCheck.getId()) &&
-//                        userToCheck.getEmail().equals(u.getEmail()))
-//                .findFirst()
-//                .ifPresent((u) -> {
-//                    throw new ValidationException("Данный адрес электронной почты уже присутствует в базе.");
-//                });
-//    }
-
     private User changeUserFields(User oldUser, User newUser) {
         if (newUser.getEmail() != null && !newUser.getEmail().isBlank()) {
-//            isEmailAlreadyOccupied(newUser);
 
             oldUser.setEmail(newUser.getEmail());
         }

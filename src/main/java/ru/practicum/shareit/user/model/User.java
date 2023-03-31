@@ -14,7 +14,7 @@ import javax.validation.constraints.NotBlank;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="users")
+@Table(name = "users")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class User {
     @Id

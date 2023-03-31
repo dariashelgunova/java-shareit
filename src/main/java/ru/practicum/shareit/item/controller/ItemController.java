@@ -116,8 +116,8 @@ public class ItemController {
 
     @PostMapping("/{itemId}/comment")
     public CommentDto createComment(@PathVariable("itemId") Long itemId,
-                                 @RequestHeader("X-Sharer-User-Id") Long userId,
-                                 @Valid @RequestBody CommentDto commentDto) {
+                                    @RequestHeader("X-Sharer-User-Id") Long userId,
+                                    @Valid @RequestBody CommentDto commentDto) {
         Item item = itemService.findById(itemId);
         User author = userService.findById(userId);
         Comment newComment = commentMapper.fromDtoToComment(commentDto, item, author);

@@ -17,7 +17,7 @@ import javax.validation.constraints.Size;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="items")
+@Table(name = "items")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Item {
     @Id
@@ -31,7 +31,6 @@ public class Item {
     @NotNull
     @Column(name = "is_available")
     Boolean available;
-    // TODO: 26.03.2023 JoinColumn?
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "owner_id")
     User owner;
