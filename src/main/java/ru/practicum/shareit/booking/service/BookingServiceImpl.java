@@ -73,7 +73,7 @@ public class BookingServiceImpl implements BookingService {
         if (booking == null) {
             return false;
         }
-        return userId.equals(booking.getItem().getOwner().getId());
+        return userId.equals(booking.getItem().getOwner().getId()) && booking.getStatus().equals(Status.APPROVED);
     }
 
     public List<Booking> findBookingsByUser(Long userId, State state) {

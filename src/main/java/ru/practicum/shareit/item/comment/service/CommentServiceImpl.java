@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item.comment;
+package ru.practicum.shareit.item.comment.service;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

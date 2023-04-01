@@ -10,10 +10,10 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.item.comment.CommentService;
 import ru.practicum.shareit.item.comment.dto.CommentDto;
 import ru.practicum.shareit.item.comment.mapper.CommentMapper;
 import ru.practicum.shareit.item.comment.model.Comment;
+import ru.practicum.shareit.item.comment.service.CommentService;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoForOwner;
 import ru.practicum.shareit.item.mapper.ItemMapper;
@@ -80,8 +80,8 @@ public class ItemController {
         List<Item> itemsByOwner = itemService.findItemsByOwner(userId);
         List<ItemDtoForOwner> result = new ArrayList<>();
         for (Item item : itemsByOwner) {
-            ItemDtoForOwner itenDto = mapToItemDtoForOwner(item, userId);
-            result.add(itenDto);
+            ItemDtoForOwner itemDto = mapToItemDtoForOwner(item, userId);
+            result.add(itemDto);
         }
 
         return result;
