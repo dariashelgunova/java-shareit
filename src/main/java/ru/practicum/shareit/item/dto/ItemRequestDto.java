@@ -16,7 +16,7 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ItemDto {
+public class ItemRequestDto {
     Long id;
     @NotBlank(groups = {Create.class}, message = "Имя не может быть пустым. Попробуйте еще раз.")
     String name;

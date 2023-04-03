@@ -1,21 +1,21 @@
 package ru.practicum.shareit.booking.model;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
-@Data
 @Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "bookings")
+@ToString(exclude = {"booker", "item"})
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Booking {
     @Id
@@ -33,6 +33,19 @@ public class Booking {
     User booker;
     @Enumerated(EnumType.STRING)
     Status status;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Booking booking = (Booking) o;
+        return id.equals(booking.id) && Objects.equals(start, booking.start) && Objects.equals(end, booking.end) && Objects.equals(item, booking.item) && Objects.equals(booker, booking.booker) && status == booking.status;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, start, end, item, booker, status);
+    }
 }
 
 

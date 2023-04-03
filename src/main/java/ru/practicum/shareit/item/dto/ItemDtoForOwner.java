@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.item.comment.dto.CommentDto;
+import ru.practicum.shareit.booking.dto.BookingSimpleDto;
+import ru.practicum.shareit.item.comment.dto.CommentSimpleDto;
 import ru.practicum.shareit.validation.Create;
 import ru.practicum.shareit.validation.Update;
 
@@ -28,9 +28,11 @@ public class ItemDtoForOwner {
     String description;
     @NotNull(groups = {Create.class})
     Boolean available;
-    List<CommentDto> comments;
-    BookingDto lastBooking;
-    BookingDto nextBooking;
+    List<CommentSimpleDto> comments;
+    BookingSimpleDto lastBooking;
+    BookingSimpleDto nextBooking;
 }
+
+
 
 

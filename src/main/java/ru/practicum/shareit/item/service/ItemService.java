@@ -23,4 +23,10 @@ public interface ItemService {
     List<Item> findItemsBySearch(String requestText);
 
     Comment addComment(Long itemId, Long userId, Comment newComment);
+
+    Item addCommentsAndBookingsToItem(Item item, Long userId);
+
+    List<Item> addCommentsAndBookingsToItems(List<Item> items, Long userId);
+
+
 }

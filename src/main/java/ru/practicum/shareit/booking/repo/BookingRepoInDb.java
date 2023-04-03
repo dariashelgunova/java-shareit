@@ -1,29 +1,41 @@
 package ru.practicum.shareit.booking.repo;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Repository
 public interface BookingRepoInDb extends JpaRepository<Booking, Long> {
 
-    List<Booking> findByStartBeforeAndEndAfterOrderByStartDesc(LocalDateTime start, LocalDateTime end);
+    List<Booking> findByBookerIdAndStartLessThanEqualAndEndGreaterThanEqual(Long bookerId, LocalDateTime start, LocalDateTime end, Sort sort);
 
-    List<Booking> findByStartAfterOrderByStartDesc(LocalDateTime start);
+    List<Booking> findByBookerIdAndStartGreaterThanEqual(Long bookerId, LocalDateTime start, Sort sort);
 
-    List<Booking> findByEndBeforeOrderByStartDesc(LocalDateTime end);
+    List<Booking> findByBookerIdAndEndLessThanEqual(Long bookerId, LocalDateTime end, Sort sort);
 
-    List<Booking> findByStatusOrderByStartDesc(Status status);
+    List<Booking> findByBookerIdAndStatus(Long bookerId, Status status, Sort sort);
 
-    List<Booking> findByOrderByStartDesc();
+    List<Booking> findByBookerIdOrderByStartDesc(Long bookerId);
 
-    Booking findFirstByItemIdAndStartBeforeOrderByStartDesc(Long itemId, LocalDateTime start);
+    List<Booking> findByItemOwnerIdAndStartLessThanEqualAndEndGreaterThanEqual(Long itemOwnerId, LocalDateTime start, LocalDateTime end, Sort sort);
 
-    Booking findFirstByItemIdAndStartAfterOrderByStartAsc(Long itemId, LocalDateTime start);
+    List<Booking> findByItemOwnerIdAndStartGreaterThanEqual(Long itemOwnerId, LocalDateTime start, Sort sort);
 
+    List<Booking> findByItemOwnerIdAndEndLessThanEqual(Long itemOwnerId, LocalDateTime end, Sort sort);
+
+    List<Booking> findByItemOwnerIdAndStatus(Long itemOwnerId, Status status, Sort sort);
+
+    List<Booking> findByItemOwnerIdOrderByStartDesc(Long itemOwnerId);
+
+    Booking findFirstByItemIdAndStartLessThanEqualAndStatus(Long itemId, LocalDateTime start, Status status, Sort sort);
+
+    Booking findFirstByItemIdAndStartGreaterThanEqualAndStatus(Long itemId, LocalDateTime start, Status status, Sort sort);
+
+    List<Booking> findByItemIdInAndStartLessThanEqualAndStatus(List<Long> itemId, LocalDateTime start, Status status, Sort sort);
+
+    List<Booking> findByItemIdInAndStartGreaterThanEqualAndStatus(List<Long> itemId, LocalDateTime start, Status status, Sort sort);
 }
 

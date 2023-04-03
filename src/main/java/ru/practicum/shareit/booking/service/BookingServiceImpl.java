@@ -3,7 +3,9 @@ package ru.practicum.shareit.booking.service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.booking.model.Status;
@@ -17,15 +19,16 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BookingServiceImpl implements BookingService {
 
     BookingRepoInDb bookingRepoInDb;
 
+    @Transactional
     public Booking create(Booking booking, Long userId) {
         booking.setStatus(Status.WAITING);
         if (!booking.getItem().getAvailable()) {
@@ -41,6 +44,7 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
+    @Transactional
     public Booking acceptOrRejectRequest(boolean approved, Long userId, Long bookingId) {
         Booking booking = getBookingByIdOrThrowException(bookingId);
         if (Objects.equals(booking.getItem().getOwner().getId(), userId)) {
@@ -51,7 +55,7 @@ public class BookingServiceImpl implements BookingService {
             } else {
                 booking.setStatus(Status.REJECTED);
             }
-            bookingRepoInDb.save(booking);
+            //bookingRepoInDb.save(booking);
             return booking;
         } else {
             throw new NotFoundObjectException("Только собственник может менять статус бронирования!");
@@ -77,7 +81,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     public List<Booking> findBookingsByUser(Long userId, State state) {
-        List<Booking> result = getBookingsByStateAndUser(false, userId, state);
+        List<Booking> result = getBookingsByStateForBooker(userId, state);
         if (result.isEmpty()) {
             throw new NotFoundObjectException("По вашему запросу ничего найдено.");
         } else {
@@ -86,7 +90,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     public List<Booking> findBookingsByUserForComment(Long userId, State state) {
-        List<Booking> result = getBookingsByStateAndUser(false, userId, state);
+        List<Booking> result = getBookingsByStateForBooker(userId, state);
         if (result.isEmpty()) {
             throw new AvailabilityException("Нельзя оставить комментарий без бронивания.");
         } else {
@@ -95,7 +99,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     public List<Booking> findBookingsByOwner(Long userId, State state) {
-        List<Booking> result = getBookingsByStateAndUser(true, userId, state);
+        List<Booking> result = getBookingsByStateForOwner(userId, state);
         if (result.isEmpty()) {
             throw new NotFoundObjectException("По вашему запросу ничего найдено.");
         } else {
@@ -108,56 +112,90 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new NotFoundObjectException("Объект не был найден"));
     }
 
-    private List<Booking> getBookingsByStateAndUser(boolean isOwner, Long userId, State state) {
+    private List<Booking> getBookingsByStateForOwner(Long userId, State state) {
         List<Booking> result = new ArrayList<>();
         LocalDateTime currentTime = LocalDateTime.from(LocalDateTime.now());
+        Sort sort = Sort.by(Sort.Direction.DESC, "start");
 
         switch (state) {
             case CURRENT:
-                result = bookingRepoInDb.findByStartBeforeAndEndAfterOrderByStartDesc(currentTime, currentTime);
+                result = bookingRepoInDb.findByItemOwnerIdAndStartLessThanEqualAndEndGreaterThanEqual(userId, currentTime, currentTime, sort);
                 break;
 
             case FUTURE:
-                result = bookingRepoInDb.findByStartAfterOrderByStartDesc(currentTime);
+                result = bookingRepoInDb.findByItemOwnerIdAndStartGreaterThanEqual(userId, currentTime, sort);
                 break;
 
             case PAST:
-                result = bookingRepoInDb.findByEndBeforeOrderByStartDesc(currentTime);
+                result = bookingRepoInDb.findByItemOwnerIdAndEndLessThanEqual(userId, currentTime, sort);
                 break;
 
             case REJECTED:
-                result = bookingRepoInDb.findByStatusOrderByStartDesc(Status.REJECTED);
+                result = bookingRepoInDb.findByItemOwnerIdAndStatus(userId, Status.REJECTED, sort);
                 break;
 
             case WAITING:
-                result = bookingRepoInDb.findByStatusOrderByStartDesc(Status.WAITING);
+                result = bookingRepoInDb.findByItemOwnerIdAndStatus(userId, Status.WAITING, sort);
                 break;
 
             case ALL:
-                result = bookingRepoInDb.findByOrderByStartDesc();
+                result = bookingRepoInDb.findByItemOwnerIdOrderByStartDesc(userId);
                 break;
         }
-        if (isOwner) {
-            return result
-                    .stream()
-                    .filter(o -> o.getItem().getOwner().getId().equals(userId))
-                    .collect(Collectors.toList());
-        } else {
-            return result
-                    .stream()
-                    .filter(o -> o.getBooker().getId().equals(userId))
-                    .collect(Collectors.toList());
+        return result;
+    }
+
+    private List<Booking> getBookingsByStateForBooker(Long userId, State state) {
+        List<Booking> result = new ArrayList<>();
+        LocalDateTime currentTime = LocalDateTime.from(LocalDateTime.now());
+        Sort sort = Sort.by(Sort.Direction.DESC, "start");
+
+        switch (state) {
+            case CURRENT:
+                result = bookingRepoInDb.findByBookerIdAndStartLessThanEqualAndEndGreaterThanEqual(userId, currentTime, currentTime, sort);
+                break;
+
+            case FUTURE:
+                result = bookingRepoInDb.findByBookerIdAndStartGreaterThanEqual(userId, currentTime, sort);
+                break;
+
+            case PAST:
+                result = bookingRepoInDb.findByBookerIdAndEndLessThanEqual(userId, currentTime, sort);
+                break;
+
+            case REJECTED:
+                result = bookingRepoInDb.findByBookerIdAndStatus(userId, Status.REJECTED, sort);
+                break;
+
+            case WAITING:
+                result = bookingRepoInDb.findByBookerIdAndStatus(userId, Status.WAITING, sort);
+                break;
+
+            case ALL:
+                result = bookingRepoInDb.findByBookerIdOrderByStartDesc(userId);
+                break;
         }
+        return result;
     }
 
     public Booking findLastBookingByItemId(Long itemId) {
         LocalDateTime currentTime = LocalDateTime.from(LocalDateTime.now());
-        return bookingRepoInDb.findFirstByItemIdAndStartBeforeOrderByStartDesc(itemId, currentTime);
+        return bookingRepoInDb.findFirstByItemIdAndStartLessThanEqualAndStatus(itemId, currentTime, Status.APPROVED, Sort.by(Sort.Direction.DESC, "start"));
     }
 
     public Booking findNextBookingByItemId(Long itemId) {
         LocalDateTime currentTime = LocalDateTime.from(LocalDateTime.now());
-        return bookingRepoInDb.findFirstByItemIdAndStartAfterOrderByStartAsc(itemId, currentTime);
+        return bookingRepoInDb.findFirstByItemIdAndStartGreaterThanEqualAndStatus(itemId, currentTime, Status.APPROVED, Sort.by(Sort.Direction.ASC, "start"));
+    }
+
+    public List<Booking> findLastBookingByItemIds(List<Long> items) {
+        LocalDateTime currentTime = LocalDateTime.from(LocalDateTime.now());
+        return bookingRepoInDb.findByItemIdInAndStartLessThanEqualAndStatus(items, currentTime, Status.APPROVED, Sort.by(Sort.Direction.DESC, "start"));
+    }
+
+    public List<Booking> findNextBookingByItemIds(List<Long> items) {
+        LocalDateTime currentTime = LocalDateTime.from(LocalDateTime.now());
+        return bookingRepoInDb.findByItemIdInAndStartGreaterThanEqualAndStatus(items, currentTime, Status.APPROVED, Sort.by(Sort.Direction.ASC, "start"));
     }
 
 }

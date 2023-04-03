@@ -4,40 +4,46 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundObjectException;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repo.UserRepoInDb;
+import ru.practicum.shareit.user.repo.db.UserRepo;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserServiceImpl implements UserService {
-    UserRepoInDb userRepo;
+    UserRepo userRepo;
 
     public List<User> findAll() {
         return userRepo.findAll();
     }
 
+    @Transactional
     public User create(User user) {
         return userRepo.save(user);
     }
 
+    @Transactional
     public User update(User newUser, Long userId) {
         User oldUser = getUserByIdOrThrowException(userId);
         newUser.setId(userId);
-        return userRepo.save(changeUserFields(oldUser, newUser));
+        return changeUserFields(oldUser, newUser);
     }
 
     public User findById(Long userId) {
         return getUserByIdOrThrowException(userId);
     }
 
+    @Transactional
     public void deleteById(Long userId) {
         userRepo.deleteById(userId);
     }
 
+    @Transactional
     public void deleteAll() {
         userRepo.deleteAll();
     }

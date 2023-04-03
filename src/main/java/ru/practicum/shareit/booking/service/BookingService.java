@@ -25,5 +25,9 @@ public interface BookingService {
     Booking findLastBookingByItemId(Long itemId);
 
     Booking findNextBookingByItemId(Long itemId);
+
+    List<Booking> findLastBookingByItemIds(List<Long> items);
+
+    List<Booking> findNextBookingByItemIds(List<Long> items);
 }
 
