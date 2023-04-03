@@ -21,7 +21,6 @@ import ru.practicum.shareit.user.dto.UserSimpleDto;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -203,7 +202,7 @@ public class Mapper {
 
     public Comment fromCommentRequestDto(CommentDtoToReturn commentDtoToReturn, Item item, User author) {
         if (commentDtoToReturn == null) return null;
-        LocalDateTime currentTime = LocalDateTime.from(LocalDateTime.now().minus(1, ChronoUnit.SECONDS));
+        LocalDateTime currentTime = LocalDateTime.from(LocalDateTime.now());
 
         Comment comment = new Comment();
         comment.setId(commentDtoToReturn.getId());
