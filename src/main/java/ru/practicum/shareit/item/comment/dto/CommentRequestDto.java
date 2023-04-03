@@ -13,7 +13,7 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CommentRequestDto {
-    Long Id;
+    Long id;
     @NotBlank
     String text;
 }
