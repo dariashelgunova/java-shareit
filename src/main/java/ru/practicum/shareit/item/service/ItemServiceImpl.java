@@ -25,9 +25,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.*;
 
 @Service
 @RequiredArgsConstructor
@@ -56,7 +56,6 @@ public class ItemServiceImpl implements ItemService {
     public Item update(Item newItem, Long ownerId, Long itemId) {
         Item oldItem = getItemByIdOrThrowException(itemId);
         if (Objects.equals(oldItem.getOwner().getId(), ownerId)) {
-            //return itemRepo.save(changeItemFields(oldItem, newItem));
             return changeItemFields(oldItem, newItem);
         } else {
             throw new AccessDeniedException("Только собственник может редактировать вещь!");
@@ -89,12 +88,7 @@ public class ItemServiceImpl implements ItemService {
 
     public List<Item> findItemsBySearch(String requestText) {
         if (StringUtils.isBlank(requestText)) return Collections.emptyList();
-        List<Item> result = itemRepo.findAll()
-                .stream()
-                .filter(o -> (o.getName().toLowerCase().contains(requestText.toLowerCase())
-                        || o.getDescription().toLowerCase().contains(requestText.toLowerCase()))
-                        && o.getAvailable())
-                .collect(toList());
+        List<Item> result = itemRepo.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailable(requestText, requestText, true);
         if (result.isEmpty()) {
             throw new NotFoundObjectException("По вашему запросу ничего найдено.");
         } else {
@@ -104,10 +98,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional
     public Comment addComment(Long itemId, Long userId, Comment newComment) {
-        List<Booking> result = bookingService.findBookingsByUserForComment(userId, State.PAST)
-                .stream()
-                .filter(b -> b.getItem().getId().equals(itemId))
-                .collect(toList());
+        List<Booking> result = bookingService.findBookingsByUserForComment(userId, State.PAST, itemId);
 
         if (!result.isEmpty()) {
             return commentRepo.save(newComment);
@@ -163,24 +154,20 @@ public class ItemServiceImpl implements ItemService {
                 .stream()
                 .collect(groupingBy(Comment::getItem, toList()));
 
-        Map<Item, List<Booking>> lastBookings = bookingService.findLastBookingByItemIds(items)
+        Map<Item, Booking> lastBookings = bookingService.findLastBookingByItemIds(items)
                 .stream()
-                .collect(groupingBy(Booking::getItem, toList()));
+                .collect(toMap(Booking::getItem, Function.identity(), (o, n) -> o));
 
-        Map<Item, List<Booking>> nextBookings = bookingService.findNextBookingByItemIds(items)
+        Map<Item, Booking> nextBookings = bookingService.findNextBookingByItemIds(items)
                 .stream()
-                .collect(groupingBy(Booking::getItem, toList()));
+                .collect(toMap(Booking::getItem, Function.identity(), (o, n) -> o));
 
         for (Item item : itemsByOwner) {
             item.setComments(comments.get(item));
-
-            if (lastBookings.containsKey(item) && !lastBookings.get(item).isEmpty()) {
-                item.setLastBooking(lastBookings.get(item).get(0));
-            }
-            if (nextBookings.containsKey(item) && !nextBookings.get(item).isEmpty()) {
-                item.setNextBooking(nextBookings.get(item).get(0));
-            }
+            item.setLastBooking(lastBookings.get(item));
+            item.setNextBooking(nextBookings.get(item));
         }
+
         return itemsByOwner;
     }
 

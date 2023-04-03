@@ -18,7 +18,7 @@ public interface BookingService {
 
     List<Booking> findBookingsByUser(Long userId, State state);
 
-    List<Booking> findBookingsByUserForComment(Long userId, State state);
+    List<Booking> findBookingsByUserForComment(Long userId, State state, Long itemId);
 
     List<Booking> findBookingsByOwner(Long userId, State state);
 

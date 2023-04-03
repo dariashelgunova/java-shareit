@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.mapper.Mapper;
 import ru.practicum.shareit.user.dto.UserRequestDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
@@ -14,6 +13,8 @@ import ru.practicum.shareit.validation.Update;
 
 import java.util.List;
 
+import static ru.practicum.shareit.user.mapper.UserMapper.*;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/users")
@@ -21,31 +22,31 @@ import java.util.List;
 public class UserController {
 
     UserService userService;
-    Mapper mapper;
 
     @GetMapping
     public List<UserRequestDto> findAll() {
-        return mapper.toUserRequestDtoList(userService.findAll());
+        return toUserRequestDtoList(userService.findAll());
     }
 
     @PostMapping
     public UserRequestDto create(@Validated(Create.class) @RequestBody UserRequestDto user) {
-        User newUser = mapper.fromUserRequestDto(user);
+        User newUser = fromUserRequestDto(user);
         User createdUser = userService.create(newUser);
-        return mapper.toUserRequestDto(createdUser);
+        return toUserRequestDto(createdUser);
     }
 
     @PatchMapping("/{userId}")
-    public UserRequestDto update(@PathVariable("userId") Long userId, @Validated(Update.class) @RequestBody UserRequestDto user) {
-        User newUser = mapper.fromUserRequestDto(user);
+    public UserRequestDto update(@PathVariable("userId") Long userId,
+                                 @Validated(Update.class) @RequestBody UserRequestDto user) {
+        User newUser = fromUserRequestDto(user);
         User updatedUser = userService.update(newUser, userId);
-        return mapper.toUserRequestDto(updatedUser);
+        return toUserRequestDto(updatedUser);
     }
 
     @GetMapping("/{userId}")
     public UserRequestDto findById(@PathVariable("userId") Long userId) {
         User user = userService.findById(userId);
-        return mapper.toUserRequestDto(user);
+        return toUserRequestDto(user);
     }
 
     @DeleteMapping("/{userId}")

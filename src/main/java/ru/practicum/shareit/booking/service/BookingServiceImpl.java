@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.booking.model.Status;
-import ru.practicum.shareit.booking.repo.BookingRepoInDb;
+import ru.practicum.shareit.booking.repo.BookingRepo;
 import ru.practicum.shareit.exception.ApproveBookingException;
 import ru.practicum.shareit.exception.AvailabilityException;
 import ru.practicum.shareit.exception.NotFoundObjectException;
@@ -26,7 +26,7 @@ import java.util.Objects;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BookingServiceImpl implements BookingService {
 
-    BookingRepoInDb bookingRepoInDb;
+    BookingRepo bookingRepo;
 
     @Transactional
     public Booking create(Booking booking, Long userId) {
@@ -40,7 +40,7 @@ public class BookingServiceImpl implements BookingService {
         } else if (booking.getBooker().getId().equals(booking.getItem().getOwner().getId())) {
             throw new ApproveBookingException("Собственник не может взять в аренду свою же вещь!");
         } else {
-            return bookingRepoInDb.save(booking);
+            return bookingRepo.save(booking);
         }
     }
 
@@ -55,7 +55,6 @@ public class BookingServiceImpl implements BookingService {
             } else {
                 booking.setStatus(Status.REJECTED);
             }
-            //bookingRepoInDb.save(booking);
             return booking;
         } else {
             throw new NotFoundObjectException("Только собственник может менять статус бронирования!");
@@ -89,13 +88,18 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
-    public List<Booking> findBookingsByUserForComment(Long userId, State state) {
-        List<Booking> result = getBookingsByStateForBooker(userId, state);
-        if (result.isEmpty()) {
-            throw new AvailabilityException("Нельзя оставить комментарий без бронивания.");
-        } else {
-            return result;
-        }
+    public List<Booking> findBookingsByUserForComment(Long userId, State state, Long itemId) {
+        return getBookingsByStateForComment(userId, itemId);
+    }
+
+    private List<Booking> getBookingsByStateForComment(Long userId, Long itemId) {
+        List<Booking> result;
+        LocalDateTime currentTime = LocalDateTime.from(LocalDateTime.now());
+        Sort sort = Sort.by(Sort.Direction.DESC, "start");
+
+        result = bookingRepo.findByItemIdAndBookerIdAndEndLessThanEqualAndStatus(itemId, userId, currentTime, sort, Status.APPROVED);
+
+        return result;
     }
 
     public List<Booking> findBookingsByOwner(Long userId, State state) {
@@ -108,7 +112,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private Booking getBookingByIdOrThrowException(Long bookingId) {
-        return bookingRepoInDb.findById(bookingId)
+        return bookingRepo.findById(bookingId)
                 .orElseThrow(() -> new NotFoundObjectException("Объект не был найден"));
     }
 
@@ -119,27 +123,27 @@ public class BookingServiceImpl implements BookingService {
 
         switch (state) {
             case CURRENT:
-                result = bookingRepoInDb.findByItemOwnerIdAndStartLessThanEqualAndEndGreaterThanEqual(userId, currentTime, currentTime, sort);
+                result = bookingRepo.findByItemOwnerIdAndStartLessThanEqualAndEndGreaterThanEqual(userId, currentTime, currentTime, sort);
                 break;
 
             case FUTURE:
-                result = bookingRepoInDb.findByItemOwnerIdAndStartGreaterThanEqual(userId, currentTime, sort);
+                result = bookingRepo.findByItemOwnerIdAndStartGreaterThanEqual(userId, currentTime, sort);
                 break;
 
             case PAST:
-                result = bookingRepoInDb.findByItemOwnerIdAndEndLessThanEqual(userId, currentTime, sort);
+                result = bookingRepo.findByItemOwnerIdAndEndLessThanEqual(userId, currentTime, sort);
                 break;
 
             case REJECTED:
-                result = bookingRepoInDb.findByItemOwnerIdAndStatus(userId, Status.REJECTED, sort);
+                result = bookingRepo.findByItemOwnerIdAndStatus(userId, Status.REJECTED, sort);
                 break;
 
             case WAITING:
-                result = bookingRepoInDb.findByItemOwnerIdAndStatus(userId, Status.WAITING, sort);
+                result = bookingRepo.findByItemOwnerIdAndStatus(userId, Status.WAITING, sort);
                 break;
 
             case ALL:
-                result = bookingRepoInDb.findByItemOwnerIdOrderByStartDesc(userId);
+                result = bookingRepo.findByItemOwnerIdOrderByStartDesc(userId);
                 break;
         }
         return result;
@@ -152,27 +156,27 @@ public class BookingServiceImpl implements BookingService {
 
         switch (state) {
             case CURRENT:
-                result = bookingRepoInDb.findByBookerIdAndStartLessThanEqualAndEndGreaterThanEqual(userId, currentTime, currentTime, sort);
+                result = bookingRepo.findByBookerIdAndStartLessThanEqualAndEndGreaterThanEqual(userId, currentTime, currentTime, sort);
                 break;
 
             case FUTURE:
-                result = bookingRepoInDb.findByBookerIdAndStartGreaterThanEqual(userId, currentTime, sort);
+                result = bookingRepo.findByBookerIdAndStartGreaterThanEqual(userId, currentTime, sort);
                 break;
 
             case PAST:
-                result = bookingRepoInDb.findByBookerIdAndEndLessThanEqual(userId, currentTime, sort);
+                result = bookingRepo.findByBookerIdAndEndLessThanEqual(userId, currentTime, sort);
                 break;
 
             case REJECTED:
-                result = bookingRepoInDb.findByBookerIdAndStatus(userId, Status.REJECTED, sort);
+                result = bookingRepo.findByBookerIdAndStatus(userId, Status.REJECTED, sort);
                 break;
 
             case WAITING:
-                result = bookingRepoInDb.findByBookerIdAndStatus(userId, Status.WAITING, sort);
+                result = bookingRepo.findByBookerIdAndStatus(userId, Status.WAITING, sort);
                 break;
 
             case ALL:
-                result = bookingRepoInDb.findByBookerIdOrderByStartDesc(userId);
+                result = bookingRepo.findByBookerIdOrderByStartDesc(userId);
                 break;
         }
         return result;
@@ -180,22 +184,22 @@ public class BookingServiceImpl implements BookingService {
 
     public Booking findLastBookingByItemId(Long itemId) {
         LocalDateTime currentTime = LocalDateTime.from(LocalDateTime.now());
-        return bookingRepoInDb.findFirstByItemIdAndStartLessThanEqualAndStatus(itemId, currentTime, Status.APPROVED, Sort.by(Sort.Direction.DESC, "start"));
+        return bookingRepo.findFirstByItemIdAndStartLessThanEqualAndStatus(itemId, currentTime, Status.APPROVED, Sort.by(Sort.Direction.DESC, "start"));
     }
 
     public Booking findNextBookingByItemId(Long itemId) {
         LocalDateTime currentTime = LocalDateTime.from(LocalDateTime.now());
-        return bookingRepoInDb.findFirstByItemIdAndStartGreaterThanEqualAndStatus(itemId, currentTime, Status.APPROVED, Sort.by(Sort.Direction.ASC, "start"));
+        return bookingRepo.findFirstByItemIdAndStartAfterAndStatus(itemId, currentTime, Status.APPROVED, Sort.by(Sort.Direction.ASC, "start"));
     }
 
     public List<Booking> findLastBookingByItemIds(List<Long> items) {
         LocalDateTime currentTime = LocalDateTime.from(LocalDateTime.now());
-        return bookingRepoInDb.findByItemIdInAndStartLessThanEqualAndStatus(items, currentTime, Status.APPROVED, Sort.by(Sort.Direction.DESC, "start"));
+        return bookingRepo.findByItemIdInAndStartLessThanEqualAndStatus(items, currentTime, Status.APPROVED, Sort.by(Sort.Direction.DESC, "start"));
     }
 
     public List<Booking> findNextBookingByItemIds(List<Long> items) {
         LocalDateTime currentTime = LocalDateTime.from(LocalDateTime.now());
-        return bookingRepoInDb.findByItemIdInAndStartGreaterThanEqualAndStatus(items, currentTime, Status.APPROVED, Sort.by(Sort.Direction.ASC, "start"));
+        return bookingRepo.findByItemIdInAndStartAfterAndStatus(items, currentTime, Status.APPROVED, Sort.by(Sort.Direction.ASC, "start"));
     }
 
 }

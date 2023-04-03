@@ -8,7 +8,7 @@ import ru.practicum.shareit.booking.model.Status;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface BookingRepoInDb extends JpaRepository<Booking, Long> {
+public interface BookingRepo extends JpaRepository<Booking, Long> {
 
     List<Booking> findByBookerIdAndStartLessThanEqualAndEndGreaterThanEqual(Long bookerId, LocalDateTime start, LocalDateTime end, Sort sort);
 
@@ -32,10 +32,13 @@ public interface BookingRepoInDb extends JpaRepository<Booking, Long> {
 
     Booking findFirstByItemIdAndStartLessThanEqualAndStatus(Long itemId, LocalDateTime start, Status status, Sort sort);
 
-    Booking findFirstByItemIdAndStartGreaterThanEqualAndStatus(Long itemId, LocalDateTime start, Status status, Sort sort);
+    Booking findFirstByItemIdAndStartAfterAndStatus(Long itemId, LocalDateTime start, Status status, Sort sort);
 
     List<Booking> findByItemIdInAndStartLessThanEqualAndStatus(List<Long> itemId, LocalDateTime start, Status status, Sort sort);
 
-    List<Booking> findByItemIdInAndStartGreaterThanEqualAndStatus(List<Long> itemId, LocalDateTime start, Status status, Sort sort);
+    List<Booking> findByItemIdInAndStartAfterAndStatus(List<Long> itemId, LocalDateTime start, Status status, Sort sort);
+
+    List<Booking> findByItemIdAndBookerIdAndEndLessThanEqualAndStatus(Long itemId, Long bookerId, LocalDateTime currentTime, Sort sort, Status status);
+
 }
 

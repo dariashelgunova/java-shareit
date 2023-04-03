@@ -30,7 +30,6 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User update(User newUser, Long userId) {
         User oldUser = getUserByIdOrThrowException(userId);
-        newUser.setId(userId);
         return changeUserFields(oldUser, newUser);
     }
 
