@@ -15,7 +15,7 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserDto {
+public class UserRequestDto {
     Long id;
     @NotBlank(groups = {Create.class}, message = "Адрес электронной почты отсутствует. Попробуйте еще раз.")
     @Email(groups = {Create.class, Update.class}, message = "Необходимо ввести электронную почту в соответствующем формате. Например - name@gmail.com")

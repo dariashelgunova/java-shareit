@@ -5,14 +5,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.mapper.UserMapper;
+import ru.practicum.shareit.user.dto.UserRequestDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 import ru.practicum.shareit.validation.Create;
 import ru.practicum.shareit.validation.Update;
 
 import java.util.List;
+
+import static ru.practicum.shareit.user.mapper.UserMapper.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,31 +22,31 @@ import java.util.List;
 public class UserController {
 
     UserService userService;
-    UserMapper userMapper;
 
     @GetMapping
-    public List<UserDto> findAll() {
-        return userMapper.changeListFromUserToDto(userService.findAll());
+    public List<UserRequestDto> findAll() {
+        return toUserRequestDtoList(userService.findAll());
     }
 
     @PostMapping
-    public UserDto create(@Validated(Create.class) @RequestBody UserDto user) {
-        User newUser = userMapper.fromDtoToUser(user);
+    public UserRequestDto create(@Validated(Create.class) @RequestBody UserRequestDto user) {
+        User newUser = fromUserRequestDto(user);
         User createdUser = userService.create(newUser);
-        return userMapper.fromUserToDto(createdUser);
+        return toUserRequestDto(createdUser);
     }
 
     @PatchMapping("/{userId}")
-    public UserDto update(@PathVariable("userId") Long userId, @Validated(Update.class) @RequestBody UserDto user) {
-        User newUser = userMapper.fromDtoToUser(user);
+    public UserRequestDto update(@PathVariable("userId") Long userId,
+                                 @Validated(Update.class) @RequestBody UserRequestDto user) {
+        User newUser = fromUserRequestDto(user);
         User updatedUser = userService.update(newUser, userId);
-        return userMapper.fromUserToDto(updatedUser);
+        return toUserRequestDto(updatedUser);
     }
 
     @GetMapping("/{userId}")
-    public UserDto findById(@PathVariable("userId") Long userId) {
+    public UserRequestDto findById(@PathVariable("userId") Long userId) {
         User user = userService.findById(userId);
-        return userMapper.fromUserToDto(user);
+        return toUserRequestDto(user);
     }
 
     @DeleteMapping("/{userId}")

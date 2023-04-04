@@ -1,36 +1,64 @@
 package ru.practicum.shareit.user.mapper;
 
-import org.springframework.stereotype.Component;
-import ru.practicum.shareit.user.dto.UserDto;
+import lombok.experimental.UtilityClass;
+import ru.practicum.shareit.user.dto.UserRequestDto;
+import ru.practicum.shareit.user.dto.UserSimpleDto;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
+@UtilityClass
 public class UserMapper {
-    public User fromDtoToUser(UserDto userDto) {
+
+    public static User fromUserRequestDto(UserRequestDto userRequestDto) {
+        if (userRequestDto == null) return null;
+
         User user = new User();
-        user.setId(userDto.getId());
-        user.setName(userDto.getName());
-        user.setEmail(userDto.getEmail());
+        user.setId(userRequestDto.getId());
+        user.setName(userRequestDto.getName());
+        user.setEmail(userRequestDto.getEmail());
 
         return user;
     }
 
-    public UserDto fromUserToDto(User user) {
-        UserDto userDto = new UserDto();
-        userDto.setId(user.getId());
-        userDto.setName(user.getName());
-        userDto.setEmail(user.getEmail());
+    public static UserRequestDto toUserRequestDto(User user) {
+        if (user == null) return null;
 
-        return userDto;
+        UserRequestDto userRequestDto = new UserRequestDto();
+        userRequestDto.setId(user.getId());
+        userRequestDto.setName(user.getName());
+        userRequestDto.setEmail(user.getEmail());
+
+        return userRequestDto;
     }
 
-    public List<UserDto> changeListFromUserToDto(List<User> users) {
+    public static List<UserRequestDto> toUserRequestDtoList(List<User> users) {
+        if (users == null) return null;
+
         return users
                 .stream()
-                .map(this::fromUserToDto)
+                .map(UserMapper::toUserRequestDto)
                 .collect(Collectors.toList());
     }
+
+    public static UserSimpleDto toUserSimpleDto(User user) {
+        if (user == null) return null;
+
+        UserSimpleDto userRequestDto = new UserSimpleDto();
+        userRequestDto.setId(user.getId());
+
+        return userRequestDto;
+    }
+
+    public static List<UserSimpleDto> toUserSimpleDto(List<User> users) {
+        if (users == null) return null;
+
+        return users
+                .stream()
+                .map(UserMapper::toUserSimpleDto)
+                .collect(Collectors.toList());
+    }
+
+
 }
