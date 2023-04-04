@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user.mapper;
 
+import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.user.dto.UserRequestDto;
 import ru.practicum.shareit.user.dto.UserSimpleDto;
 import ru.practicum.shareit.user.model.User;
@@ -7,6 +8,7 @@ import ru.practicum.shareit.user.model.User;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@UtilityClass
 public class UserMapper {
 
     public static User fromUserRequestDto(UserRequestDto userRequestDto) {

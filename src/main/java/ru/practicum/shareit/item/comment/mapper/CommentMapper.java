@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.comment.mapper;
 
+import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.item.comment.dto.CommentDtoToReturn;
 import ru.practicum.shareit.item.comment.dto.CommentRequestDto;
 import ru.practicum.shareit.item.comment.dto.CommentSimpleDto;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@UtilityClass
 public class CommentMapper {
 
     public static Comment fromCommentRequestDto(CommentRequestDto commentDto, Item item, User author) {

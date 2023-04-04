@@ -163,7 +163,7 @@ public class ItemServiceImpl implements ItemService {
                 .collect(toMap(Booking::getItem, Function.identity(), (o, n) -> o));
 
         for (Item item : itemsByOwner) {
-            item.setComments(comments.get(item));
+            item.setComments(comments.getOrDefault(item, List.of()));
             item.setLastBooking(lastBookings.get(item));
             item.setNextBooking(nextBookings.get(item));
         }
