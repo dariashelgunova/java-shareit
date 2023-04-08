@@ -3,7 +3,6 @@ package ru.practicum.shareit.item.service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +32,6 @@ import static java.util.stream.Collectors.*;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@Slf4j
 public class ItemServiceImpl implements ItemService {
     ItemRepo itemRepo;
     UserService userService;
@@ -113,7 +111,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private Item changeItemFields(Item oldItem, Item newItem) {
-        if (newItem.getName() != null && !newItem.getName().isBlank()) {
+        if (newItem.getName() != null && !newItem.getName().isBlank()) { // TODO: 08.04.2023 StringUtils.isBlank?
             oldItem.setName(newItem.getName());
         }
         if (newItem.getDescription() != null && !newItem.getDescription().isBlank()) {
