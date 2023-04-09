@@ -88,6 +88,39 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
+    private List<Booking> getBookingsByStateForBooker(Long userId, State state) {
+        List<Booking> result = new ArrayList<>();
+        LocalDateTime currentTime = LocalDateTime.from(LocalDateTime.now());
+        Sort sort = Sort.by(Sort.Direction.DESC, "start");
+
+        switch (state) {
+            case CURRENT:
+                result = bookingRepo.findByBookerIdAndStartLessThanEqualAndEndGreaterThanEqual(userId, currentTime, currentTime, sort);
+                break;
+
+            case FUTURE:
+                result = bookingRepo.findByBookerIdAndStartGreaterThanEqual(userId, currentTime, sort);
+                break;
+
+            case PAST:
+                result = bookingRepo.findByBookerIdAndEndLessThanEqual(userId, currentTime, sort);
+                break;
+
+            case REJECTED:
+                result = bookingRepo.findByBookerIdAndStatus(userId, Status.REJECTED, sort);
+                break;
+
+            case WAITING:
+                result = bookingRepo.findByBookerIdAndStatus(userId, Status.WAITING, sort);
+                break;
+
+            case ALL:
+                result = bookingRepo.findByBookerIdOrderByStartDesc(userId);
+                break;
+        }
+        return result;
+    }
+
     public List<Booking> findBookingsByUserForComment(Long userId, State state, Long itemId) {
         return getBookingsByStateForComment(userId, itemId);
     }
@@ -149,38 +182,7 @@ public class BookingServiceImpl implements BookingService {
         return result;
     }
 
-    private List<Booking> getBookingsByStateForBooker(Long userId, State state) {
-        List<Booking> result = new ArrayList<>();
-        LocalDateTime currentTime = LocalDateTime.from(LocalDateTime.now());
-        Sort sort = Sort.by(Sort.Direction.DESC, "start");
 
-        switch (state) {
-            case CURRENT:
-                result = bookingRepo.findByBookerIdAndStartLessThanEqualAndEndGreaterThanEqual(userId, currentTime, currentTime, sort);
-                break;
-
-            case FUTURE:
-                result = bookingRepo.findByBookerIdAndStartGreaterThanEqual(userId, currentTime, sort);
-                break;
-
-            case PAST:
-                result = bookingRepo.findByBookerIdAndEndLessThanEqual(userId, currentTime, sort);
-                break;
-
-            case REJECTED:
-                result = bookingRepo.findByBookerIdAndStatus(userId, Status.REJECTED, sort);
-                break;
-
-            case WAITING:
-                result = bookingRepo.findByBookerIdAndStatus(userId, Status.WAITING, sort);
-                break;
-
-            case ALL:
-                result = bookingRepo.findByBookerIdOrderByStartDesc(userId);
-                break;
-        }
-        return result;
-    }
 
     public Booking findLastBookingByItemId(Long itemId) {
         LocalDateTime currentTime = LocalDateTime.from(LocalDateTime.now());
