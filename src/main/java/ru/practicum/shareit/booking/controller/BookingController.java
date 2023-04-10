@@ -53,17 +53,21 @@ public class BookingController {
     }
 
     @GetMapping
-    public List<BookingDtoToReturn> findBookingsByUser(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public List<BookingDtoToReturn> findBookingsByUser(@RequestParam(defaultValue = "-1") Integer from,
+                                                       @RequestParam(defaultValue = "-1") Integer size,
+                                                       @RequestHeader("X-Sharer-User-Id") Long userId,
                                                        @RequestParam(defaultValue = "ALL") String state) {
         State stateEnum = State.findByValueOrThrowException(state);
-        return toBookingDtoToReturnList(bookingService.findBookingsByUser(userId, stateEnum));
+        return toBookingDtoToReturnList(bookingService.findBookingsByUser(userId, stateEnum, from, size));
     }
 
     @GetMapping("/owner")
-    public List<BookingDtoToReturn> findBookingsByOwner(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public List<BookingDtoToReturn> findBookingsByOwner(@RequestParam(defaultValue = "-1") Integer from,
+                                                        @RequestParam(defaultValue = "-1") Integer size,
+                                                        @RequestHeader("X-Sharer-User-Id") Long userId,
                                                         @RequestParam(defaultValue = "ALL") String state) {
         State stateEnum = State.findByValueOrThrowException(state);
-        return toBookingDtoToReturnList(bookingService.findBookingsByOwner(userId, stateEnum));
+        return toBookingDtoToReturnList(bookingService.findBookingsByOwner(userId, stateEnum, from, size));
     }
 
     private Item setItem(BookingRequestDto bookingRequestDto) {

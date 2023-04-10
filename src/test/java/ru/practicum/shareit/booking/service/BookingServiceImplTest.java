@@ -224,7 +224,7 @@ class BookingServiceImplTest {
     public void givenUserId_whenNoObjectsFoundAndCurrentState_thenThrowNotFoundObjectException() {
         when(bookingRepo.findByBookerIdAndStartLessThanEqualAndEndGreaterThanEqual(any(), any(), any(), any()))
                 .thenReturn(Collections.emptyList());
-        assertThrows(NotFoundObjectException.class, () -> service.findBookingsByUser(1L, State.CURRENT));
+        assertThrows(NotFoundObjectException.class, () -> service.findBookingsByUser(1L, State.CURRENT, -1, -1));
     }
 
     @Test
@@ -236,7 +236,7 @@ class BookingServiceImplTest {
         when(bookingRepo.findByBookerIdAndStartLessThanEqualAndEndGreaterThanEqual(any(), any(), any(), any()))
                 .thenReturn(expected);
 
-        assertEquals(expected, service.findBookingsByUser(1L, State.CURRENT));
+        assertEquals(expected, service.findBookingsByUser(1L, State.CURRENT, -1, -1));
     }
 
     @Test
@@ -248,7 +248,7 @@ class BookingServiceImplTest {
         when(bookingRepo.findByBookerIdAndStartGreaterThanEqual(any(), any(), any()))
                 .thenReturn(expected);
 
-        assertEquals(expected, service.findBookingsByUser(1L, State.FUTURE));
+        assertEquals(expected, service.findBookingsByUser(1L, State.FUTURE, -1, -1));
     }
 
     @Test
@@ -260,7 +260,7 @@ class BookingServiceImplTest {
         when(bookingRepo.findByBookerIdAndEndLessThanEqual(any(), any(), any()))
                 .thenReturn(expected);
 
-        assertEquals(expected, service.findBookingsByUser(1L, State.PAST));
+        assertEquals(expected, service.findBookingsByUser(1L, State.PAST, -1, -1));
     }
 
     @Test
@@ -272,7 +272,7 @@ class BookingServiceImplTest {
         when(bookingRepo.findByBookerIdAndStatus(any(), any(), any()))
                 .thenReturn(expected);
 
-        assertEquals(expected, service.findBookingsByUser(1L, State.REJECTED));
+        assertEquals(expected, service.findBookingsByUser(1L, State.REJECTED, -1, -1));
     }
 
     @Test
@@ -284,7 +284,7 @@ class BookingServiceImplTest {
         when(bookingRepo.findByBookerIdAndStatus(any(), any(), any()))
                 .thenReturn(expected);
 
-        assertEquals(expected, service.findBookingsByUser(1L, State.WAITING));
+        assertEquals(expected, service.findBookingsByUser(1L, State.WAITING, -1, -1));
     }
 
     @Test
@@ -296,7 +296,7 @@ class BookingServiceImplTest {
         when(bookingRepo.findByBookerIdOrderByStartDesc(any()))
                 .thenReturn(expected);
 
-        assertEquals(expected, service.findBookingsByUser(1L, State.ALL));
+        assertEquals(expected, service.findBookingsByUser(1L, State.ALL, -1, -1));
     }
 
     @Test
@@ -311,7 +311,7 @@ class BookingServiceImplTest {
     public void givenOwnerId_whenNoObjectsFoundAndCurrentState_thenThrowNotFoundObjectException() {
         when(bookingRepo.findByItemOwnerIdAndStartLessThanEqualAndEndGreaterThanEqual(any(), any(), any(), any()))
                 .thenReturn(Collections.emptyList());
-        assertThrows(NotFoundObjectException.class, () -> service.findBookingsByOwner(1L, State.CURRENT));
+        assertThrows(NotFoundObjectException.class, () -> service.findBookingsByOwner(1L, State.CURRENT, -1, -1));
     }
 
     @Test
@@ -323,7 +323,7 @@ class BookingServiceImplTest {
         when(bookingRepo.findByItemOwnerIdAndStartLessThanEqualAndEndGreaterThanEqual(any(), any(), any(), any()))
                 .thenReturn(expected);
 
-        assertEquals(expected, service.findBookingsByOwner(1L, State.CURRENT));
+        assertEquals(expected, service.findBookingsByOwner(1L, State.CURRENT, -1, -1));
     }
 
     @Test
@@ -335,7 +335,7 @@ class BookingServiceImplTest {
         when(bookingRepo.findByItemOwnerIdAndStartGreaterThanEqual(any(), any(), any()))
                 .thenReturn(expected);
 
-        assertEquals(expected, service.findBookingsByOwner(1L, State.FUTURE));
+        assertEquals(expected, service.findBookingsByOwner(1L, State.FUTURE, -1, -1));
     }
 
     @Test
@@ -347,7 +347,7 @@ class BookingServiceImplTest {
         when(bookingRepo.findByItemOwnerIdAndEndLessThanEqual(any(), any(), any()))
                 .thenReturn(expected);
 
-        assertEquals(expected, service.findBookingsByOwner(1L, State.PAST));
+        assertEquals(expected, service.findBookingsByOwner(1L, State.PAST, -1, -1));
     }
 
     @Test
@@ -359,7 +359,7 @@ class BookingServiceImplTest {
         when(bookingRepo.findByItemOwnerIdAndStatus(any(), any(), any()))
                 .thenReturn(expected);
 
-        assertEquals(expected, service.findBookingsByOwner(1L, State.REJECTED));
+        assertEquals(expected, service.findBookingsByOwner(1L, State.REJECTED, -1, -1));
     }
 
     @Test
@@ -371,7 +371,7 @@ class BookingServiceImplTest {
         when(bookingRepo.findByItemOwnerIdAndStatus(any(), any(), any()))
                 .thenReturn(expected);
 
-        assertEquals(expected, service.findBookingsByOwner(1L, State.WAITING));
+        assertEquals(expected, service.findBookingsByOwner(1L, State.WAITING, -1, -1));
     }
 
     @Test
@@ -383,7 +383,7 @@ class BookingServiceImplTest {
         when(bookingRepo.findByItemOwnerIdOrderByStartDesc(any()))
                 .thenReturn(expected);
 
-        assertEquals(expected, service.findBookingsByOwner(1L, State.ALL));
+        assertEquals(expected, service.findBookingsByOwner(1L, State.ALL, -1, -1));
     }
 
     @Test

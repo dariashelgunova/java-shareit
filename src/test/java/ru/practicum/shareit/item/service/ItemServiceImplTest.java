@@ -194,7 +194,7 @@ public class ItemServiceImplTest {
         long ownerId = 1L;
         when(itemRepo.findByOwnerId(ownerId)).thenReturn(Collections.emptyList());
 
-        assertThrows(NotFoundObjectException.class, () -> service.findItemsByOwner(ownerId));
+        assertThrows(NotFoundObjectException.class, () -> service.findItemsByOwner(ownerId, -1, -1));
     }
 
     @Test
@@ -203,7 +203,7 @@ public class ItemServiceImplTest {
         long ownerId = 1L;
         when(itemRepo.findByOwnerId(ownerId)).thenReturn(List.of(createItemWithOwner(itemId, ownerId)));
 
-        List<Item> itemsByOwner = service.findItemsByOwner(ownerId);
+        List<Item> itemsByOwner = service.findItemsByOwner(ownerId, -1, -1);
 
         assertEquals(1, itemsByOwner.size());
     }
@@ -212,7 +212,7 @@ public class ItemServiceImplTest {
     public void givenBlankRequestText_whenFindingItemsByEmptyText_thenReturnEmptyList() {
         String emptyRequestText = "";
 
-        List<Item> foundItems = service.findItemsBySearch(emptyRequestText);
+        List<Item> foundItems = service.findItemsBySearch(emptyRequestText, -1, -1);
 
         assertTrue(foundItems.isEmpty());
     }
@@ -223,7 +223,7 @@ public class ItemServiceImplTest {
         when(itemRepo.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailable(requestText, requestText, true))
                 .thenReturn(Collections.emptyList());
 
-        assertThrows(NotFoundObjectException.class, () -> service.findItemsBySearch(requestText));
+        assertThrows(NotFoundObjectException.class, () -> service.findItemsBySearch(requestText, -1, -1));
     }
 
     @Test
@@ -232,7 +232,7 @@ public class ItemServiceImplTest {
         when(itemRepo.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailable(requestText, requestText, true))
                 .thenReturn(List.of(createItemWithOwner(1L, 1L)));
 
-        List<Item> foundItems = service.findItemsBySearch(requestText);
+        List<Item> foundItems = service.findItemsBySearch(requestText, -1, -1);
 
         assertEquals(1, foundItems.size());
     }

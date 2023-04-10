@@ -2,9 +2,12 @@ package ru.practicum.shareit.request.model;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -13,7 +16,7 @@ import java.util.Objects;
 @Entity
 @Getter
 @Setter
-@ToString
+@ToString(exclude = {"requestor"})
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "requests")
@@ -22,9 +25,14 @@ public class ItemRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+    String description;
+    LocalDateTime created;
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "requestor_id")
     User requestor;
+    @Transient
+    List<Item> items;
+
 
     @Override
     public boolean equals(Object o) {

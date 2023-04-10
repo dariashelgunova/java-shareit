@@ -13,6 +13,8 @@ import ru.practicum.shareit.item.dto.ItemDtoForOwner;
 import ru.practicum.shareit.item.dto.ItemRequestDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 import ru.practicum.shareit.validation.Create;
@@ -34,11 +36,14 @@ public class ItemController {
     ItemService itemService;
     UserService userService;
 
+    ItemRequestService itemRequestService;
+
 
     @PostMapping
     public ItemRequestDto create(@Validated(Create.class) @RequestBody ItemRequestDto item,
                                  @RequestHeader("X-Sharer-User-Id") Long userId) {
-        Item newItem = fromItemRequestDto(item);
+        ItemRequest request = itemRequestService.checkIfRequestIdIsNotNull(item.getRequestId(), userId);
+        Item newItem = fromItemRequestDto(item, request);
         Item createdItem = itemService.create(newItem, userId);
         return toItemRequestDto(createdItem);
     }
@@ -47,7 +52,8 @@ public class ItemController {
     public ItemRequestDto update(@PathVariable("itemId") Long itemId,
                                  @Validated(Update.class) @RequestBody ItemRequestDto item,
                                  @RequestHeader("X-Sharer-User-Id") Long userId) {
-        Item newItem = fromItemRequestDto(item);
+        ItemRequest request = itemRequestService.checkIfRequestIdIsNotNull(item.getRequestId(), userId);
+        Item newItem = fromItemRequestDto(item, request);
         Item updatedItem = itemService.update(newItem, userId, itemId);
         return toItemRequestDto(updatedItem);
     }
@@ -70,14 +76,18 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDtoForOwner> findItemsByOwner(@RequestHeader("X-Sharer-User-Id") Long userId) {
-        List<Item> itemsByOwner = itemService.findItemsByOwner(userId);
+    public List<ItemDtoForOwner> findItemsByOwner(@RequestParam(defaultValue = "-1") Integer from,
+                                                  @RequestParam(defaultValue = "-1") Integer size,
+                                                  @RequestHeader("X-Sharer-User-Id") Long userId) {
+        List<Item> itemsByOwner = itemService.findItemsByOwner(userId, from, size);
         return toItemDtoForOwnerList(itemService.addCommentsAndBookingsToItems(itemsByOwner, userId));
     }
 
     @GetMapping("/search")
-    public List<ItemRequestDto> findItemsBySearch(@RequestParam String text) {
-        return toItemRequestDtoList(itemService.findItemsBySearch(text));
+    public List<ItemRequestDto> findItemsBySearch(@RequestParam(defaultValue = "-1") Integer from,
+                                                  @RequestParam(defaultValue = "-1") Integer size,
+                                                  @RequestParam String text) {
+        return toItemRequestDtoList(itemService.findItemsBySearch(text, from, size));
     }
 
     @PostMapping("/{itemId}/comment")

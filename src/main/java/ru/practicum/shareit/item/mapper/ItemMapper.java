@@ -7,6 +7,7 @@ import ru.practicum.shareit.item.dto.ItemDtoWithComments;
 import ru.practicum.shareit.item.dto.ItemRequestDto;
 import ru.practicum.shareit.item.dto.ItemSimpleDto;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.model.ItemRequest;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,7 +18,7 @@ import static ru.practicum.shareit.item.comment.mapper.CommentMapper.toCommentSi
 @UtilityClass
 public class ItemMapper {
 
-    public static Item fromItemRequestDto(ItemRequestDto itemRequestDto) {
+    public static Item fromItemRequestDto(ItemRequestDto itemRequestDto, ItemRequest request) {
         if (itemRequestDto == null) return null;
 
         Item item = new Item();
@@ -25,6 +26,7 @@ public class ItemMapper {
         item.setName(itemRequestDto.getName());
         item.setDescription(itemRequestDto.getDescription());
         item.setAvailable(itemRequestDto.getAvailable());
+        item.setRequest(request);
 
         return item;
     }
@@ -37,6 +39,10 @@ public class ItemMapper {
         itemRequestDto.setName(item.getName());
         itemRequestDto.setDescription(item.getDescription());
         itemRequestDto.setAvailable(item.getAvailable());
+        if (item.getRequest() != null) {
+            itemRequestDto.setRequestId(item.getRequest().getId());
+        }
+
 
         return itemRequestDto;
     }

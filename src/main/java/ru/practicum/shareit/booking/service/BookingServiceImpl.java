@@ -14,6 +14,8 @@ import ru.practicum.shareit.exception.ApproveBookingException;
 import ru.practicum.shareit.exception.AvailabilityException;
 import ru.practicum.shareit.exception.NotFoundObjectException;
 import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.paginator.Page;
+import ru.practicum.shareit.paginator.Paginator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -27,6 +29,7 @@ import java.util.Objects;
 public class BookingServiceImpl implements BookingService {
 
     BookingRepo bookingRepo;
+    Paginator<Booking> paginator;
 
     @Transactional
     public Booking create(Booking booking, Long userId) {
@@ -79,8 +82,9 @@ public class BookingServiceImpl implements BookingService {
         return userId.equals(booking.getItem().getOwner().getId()) && booking.getStatus().equals(Status.APPROVED);
     }
 
-    public List<Booking> findBookingsByUser(Long userId, State state) {
-        List<Booking> result = getBookingsByStateForBooker(userId, state);
+    public List<Booking> findBookingsByUser(Long userId, State state, Integer from, Integer size) {
+        List<Booking> all = getBookingsByStateForBooker(userId, state);
+        List<Booking> result = paginator.paginate(new Page(from, size), all);
         if (result.isEmpty()) {
             throw new NotFoundObjectException("По вашему запросу ничего найдено.");
         } else {
@@ -135,8 +139,9 @@ public class BookingServiceImpl implements BookingService {
         return result;
     }
 
-    public List<Booking> findBookingsByOwner(Long userId, State state) {
-        List<Booking> result = getBookingsByStateForOwner(userId, state);
+    public List<Booking> findBookingsByOwner(Long userId, State state, Integer from, Integer size) {
+        List<Booking> all = getBookingsByStateForOwner(userId, state);
+        List<Booking> result = paginator.paginate(new Page(from, size), all);
         if (result.isEmpty()) {
             throw new NotFoundObjectException("По вашему запросу ничего найдено.");
         } else {
@@ -181,8 +186,6 @@ public class BookingServiceImpl implements BookingService {
         }
         return result;
     }
-
-
 
     public Booking findLastBookingByItemId(Long itemId) {
         LocalDateTime currentTime = LocalDateTime.from(LocalDateTime.now());
