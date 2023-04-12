@@ -34,6 +34,7 @@ import static ru.practicum.shareit.request.mapper.ItemRequestMapper.toItemReques
 
 @ExtendWith(MockitoExtension.class)
 class ItemRequestControllerTest {
+    private final ObjectMapper mapper = new ObjectMapper();
     @InjectMocks
     private ItemRequestController itemRequestController;
     @Mock
@@ -42,7 +43,6 @@ class ItemRequestControllerTest {
     private UserRepo userRepo;
     @Mock
     private ItemRepo itemRepo;
-    private final ObjectMapper mapper = new ObjectMapper();
     private MockMvc mvc;
     private ItemRequest request;
     private ItemRequestRequestDto itemRequestRequestDto;
@@ -154,6 +154,6 @@ class ItemRequestControllerTest {
         itemRequest.setRequestor(requestor);
         itemRequest.setItems(Collections.singletonList(item));
 
-        return  itemRequest;
+        return itemRequest;
     }
 }

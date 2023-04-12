@@ -38,6 +38,7 @@ import static ru.practicum.shareit.booking.mapper.BookingMapper.toBookingDtoToRe
 
 @ExtendWith(MockitoExtension.class)
 class BookingControllerTest {
+    private final ObjectMapper mapper = new ObjectMapper();
     @Mock
     private BookingService bookingService;
     @Mock
@@ -50,7 +51,6 @@ class BookingControllerTest {
     private UserService userService;
     @InjectMocks
     private BookingController bookingController;
-    private final ObjectMapper mapper = new ObjectMapper();
     private MockMvc mvc;
     private Booking booking;
     private BookingRequestDto bookingRequestDto;
@@ -89,7 +89,7 @@ class BookingControllerTest {
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
-            assertEquals(mapper.writeValueAsString(bookingDtoToReturn), response);
+        assertEquals(mapper.writeValueAsString(bookingDtoToReturn), response);
     }
 
     @Test

@@ -25,21 +25,20 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFOR
 @SpringBootTest
 @DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
 public class ItemRequestServiceIT {
-    @Autowired
-    private WebApplicationContext applicationContext;
+    private static User owner;
+    private static Item createdItem1;
+    private static User requestAuthor;
+    private static ItemRequest createdRequest;
     @Autowired
     ItemRequestService itemRequestService;
     @Autowired
     ItemRequestRepo itemRequestRepo;
     @Autowired
+    private WebApplicationContext applicationContext;
+    @Autowired
     private UserService userService;
     @Autowired
     private ItemService itemService;
-
-    private static User owner;
-    private static Item createdItem1;
-    private static User requestAuthor;
-    private static ItemRequest createdRequest;
 
     @BeforeEach
     void setup() {
@@ -63,7 +62,7 @@ public class ItemRequestServiceIT {
     }
 
     @Test
-    public void givenNewItemRequest_whenCreatingRequest_thenReturnCreatedRequest(){
+    public void givenNewItemRequest_whenCreatingRequest_thenReturnCreatedRequest() {
         Long createdRequestId = itemRequestService.create(createdRequest, requestAuthor.getId()).getId();
         assertTrue(itemRequestRepo.findById(createdRequestId).isPresent());
     }
@@ -105,6 +104,6 @@ public class ItemRequestServiceIT {
         itemRequest.setRequestor(requestor);
         itemRequest.setItems(Collections.singletonList(item));
 
-        return  itemRequest;
+        return itemRequest;
     }
 }

@@ -68,7 +68,7 @@ public class ItemServiceIT {
     }
 
     @Test
-    public void givenNewItem_whenCreatingItem_thenReturnCreatedItem(){
+    public void givenNewItem_whenCreatingItem_thenReturnCreatedItem() {
         Long createdItemId = itemService.create(createdItem1, owner.getId()).getId();
         assertTrue(itemRepo.findById(createdItemId).isPresent());
     }

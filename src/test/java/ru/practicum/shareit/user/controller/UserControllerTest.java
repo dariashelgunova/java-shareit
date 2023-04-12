@@ -26,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
+    private final ObjectMapper mapper = new ObjectMapper();
     @Mock
     private UserService userService;
     @InjectMocks
@@ -33,7 +34,6 @@ class UserControllerTest {
     private User user;
     private UserRequestDto userRequestDto;
     private UserRequestDto userRequestDtoWithId;
-    private final ObjectMapper mapper = new ObjectMapper();
     private MockMvc mvc;
 
     @BeforeEach

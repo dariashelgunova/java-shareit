@@ -44,6 +44,7 @@ import static ru.practicum.shareit.item.comment.mapper.CommentMapper.toCommentSi
 @ExtendWith(MockitoExtension.class)
 class ItemControllerTest {
 
+    private final ObjectMapper mapper = new ObjectMapper();
     @Mock
     private UserRepo userRepo;
     @Mock
@@ -58,7 +59,6 @@ class ItemControllerTest {
     private ItemRequestService itemRequestService;
     @InjectMocks
     private ItemController itemController;
-    private final ObjectMapper mapper = new ObjectMapper();
     private MockMvc mvc;
     private Item item;
     private ItemRequestDto itemRequestDto;

@@ -27,22 +27,21 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFOR
 @SpringBootTest
 @DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
 public class BookingServiceIT {
+    private static Booking createdBooking1;
+    private static Booking createdBooking2;
+    private static User owner;
+    private static User booker;
+    private static Item createdItem;
+    @Autowired
+    ItemService itemService;
+    @Autowired
+    UserService userService;
     @Autowired
     private WebApplicationContext applicationContext;
     @Autowired
     private BookingService bookingService;
     @Autowired
     private BookingRepo bookingRepo;
-    @Autowired
-    ItemService itemService;
-    @Autowired
-    UserService userService;
-
-    private static Booking createdBooking1;
-    private static Booking createdBooking2;
-    private static User owner;
-    private static User booker;
-    private static Item createdItem;
 
     @BeforeEach
     void setup() {

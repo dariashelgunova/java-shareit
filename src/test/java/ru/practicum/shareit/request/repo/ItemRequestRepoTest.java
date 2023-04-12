@@ -59,7 +59,7 @@ class ItemRequestRepoTest {
         itemRequest.setCreated(LocalDateTime.now());
         itemRequest.setRequestor(requestor);
 
-        return  itemRequest;
+        return itemRequest;
     }
 
 }

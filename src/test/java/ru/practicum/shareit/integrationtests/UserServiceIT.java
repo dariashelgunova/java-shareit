@@ -29,7 +29,7 @@ public class UserServiceIT {
     private UserService userService;
 
     @Test
-    public void givenNewUser_whenCreatingUser_thenReturnCreatedUser(){
+    public void givenNewUser_whenCreatingUser_thenReturnCreatedUser() {
         User user = createUser();
         Long createdUserId = userService.create(user).getId();
         assertTrue(userRepo.findById(createdUserId).isPresent());
