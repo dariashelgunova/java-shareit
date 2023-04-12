@@ -44,7 +44,7 @@ public class ItemRequestController {
 
     @GetMapping("/{requestId}")
     public ItemRequestToReturnDto findRequestById(@PathVariable("requestId") Long requestId,
-                                                        @RequestHeader("X-Sharer-User-Id") Long userId) {
+                                                  @RequestHeader("X-Sharer-User-Id") Long userId) {
         return toItemRequestToReturnDto(itemRequestService.findById(requestId, userId));
     }
 

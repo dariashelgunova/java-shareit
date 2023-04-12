@@ -1,10 +1,10 @@
 package ru.practicum.shareit.item.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exception.AccessDeniedException;
@@ -15,6 +15,7 @@ import ru.practicum.shareit.item.comment.repo.CommentRepo;
 import ru.practicum.shareit.item.comment.service.CommentService;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repo.db.ItemRepo;
+import ru.practicum.shareit.paginator.Paginator;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -26,26 +27,27 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 public class ItemServiceImplTest {
 
     @InjectMocks
     ItemServiceImpl service;
-
     @Mock
     ItemRepo itemRepo;
-
     @Mock
     UserService userService;
-
     @Mock
     BookingService bookingService;
-
     @Mock
     CommentRepo commentRepo;
-
+    @Mock
+    Paginator<Item> itemPaginator;
     @Mock
     CommentService commentService;
+
+    @BeforeEach
+    public void before() {
+        MockitoAnnotations.openMocks(this);
+    }
 
     @Test
     public void givenItems_whenFindingAllItems_thenInvokeItemRepo() {
@@ -201,7 +203,9 @@ public class ItemServiceImplTest {
     public void givenOwnerId_whenItemsFound_thenReturnFoundItems() {
         long itemId = 1L;
         long ownerId = 1L;
-        when(itemRepo.findByOwnerId(ownerId)).thenReturn(List.of(createItemWithOwner(itemId, ownerId)));
+        List<Item> expected = List.of(createItemWithOwner(itemId, ownerId));
+        when(itemRepo.findByOwnerId(ownerId)).thenReturn(expected);
+        when(itemPaginator.paginate(any(), any())).thenReturn(expected);
 
         List<Item> itemsByOwner = service.findItemsByOwner(ownerId, -1, -1);
 
@@ -229,8 +233,10 @@ public class ItemServiceImplTest {
     @Test
     public void givenRequestText_whenItemsFoundBySearch_thenReturnFoundItems() {
         String requestText = "text";
+        List<Item> expected = List.of(createItemWithOwner(1L, 1L));
         when(itemRepo.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailable(requestText, requestText, true))
-                .thenReturn(List.of(createItemWithOwner(1L, 1L)));
+                .thenReturn(expected);
+        when(itemPaginator.paginate(any(), any())).thenReturn(expected);
 
         List<Item> foundItems = service.findItemsBySearch(requestText, -1, -1);
 

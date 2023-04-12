@@ -22,10 +22,10 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
     String text;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "item_id")
     Item item;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "author_id")
     User author;
     LocalDateTime created;

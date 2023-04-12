@@ -14,6 +14,7 @@ import ru.practicum.shareit.exception.AvailabilityException;
 import ru.practicum.shareit.exception.NotFoundObjectException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.paginator.Paginator;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
@@ -30,7 +31,8 @@ class BookingServiceImplTest {
 
     @InjectMocks
     BookingServiceImpl service;
-
+    @Mock
+    Paginator<Booking> paginator;
     @Mock
     BookingRepo bookingRepo;
 
@@ -235,6 +237,7 @@ class BookingServiceImplTest {
         List<Booking> expected = List.of(booking);
         when(bookingRepo.findByBookerIdAndStartLessThanEqualAndEndGreaterThanEqual(any(), any(), any(), any()))
                 .thenReturn(expected);
+        when(paginator.paginate(any(), any())).thenReturn(expected);
 
         assertEquals(expected, service.findBookingsByUser(1L, State.CURRENT, -1, -1));
     }
@@ -247,6 +250,7 @@ class BookingServiceImplTest {
         List<Booking> expected = List.of(booking);
         when(bookingRepo.findByBookerIdAndStartGreaterThanEqual(any(), any(), any()))
                 .thenReturn(expected);
+        when(paginator.paginate(any(), any())).thenReturn(expected);
 
         assertEquals(expected, service.findBookingsByUser(1L, State.FUTURE, -1, -1));
     }
@@ -259,6 +263,7 @@ class BookingServiceImplTest {
         List<Booking> expected = List.of(booking);
         when(bookingRepo.findByBookerIdAndEndLessThanEqual(any(), any(), any()))
                 .thenReturn(expected);
+        when(paginator.paginate(any(), any())).thenReturn(expected);
 
         assertEquals(expected, service.findBookingsByUser(1L, State.PAST, -1, -1));
     }
@@ -271,6 +276,7 @@ class BookingServiceImplTest {
         List<Booking> expected = List.of(booking);
         when(bookingRepo.findByBookerIdAndStatus(any(), any(), any()))
                 .thenReturn(expected);
+        when(paginator.paginate(any(), any())).thenReturn(expected);
 
         assertEquals(expected, service.findBookingsByUser(1L, State.REJECTED, -1, -1));
     }
@@ -283,6 +289,7 @@ class BookingServiceImplTest {
         List<Booking> expected = List.of(booking);
         when(bookingRepo.findByBookerIdAndStatus(any(), any(), any()))
                 .thenReturn(expected);
+        when(paginator.paginate(any(), any())).thenReturn(expected);
 
         assertEquals(expected, service.findBookingsByUser(1L, State.WAITING, -1, -1));
     }
@@ -295,6 +302,7 @@ class BookingServiceImplTest {
         List<Booking> expected = List.of(booking);
         when(bookingRepo.findByBookerIdOrderByStartDesc(any()))
                 .thenReturn(expected);
+        when(paginator.paginate(any(), any())).thenReturn(expected);
 
         assertEquals(expected, service.findBookingsByUser(1L, State.ALL, -1, -1));
     }
@@ -322,6 +330,7 @@ class BookingServiceImplTest {
         List<Booking> expected = List.of(booking);
         when(bookingRepo.findByItemOwnerIdAndStartLessThanEqualAndEndGreaterThanEqual(any(), any(), any(), any()))
                 .thenReturn(expected);
+        when(paginator.paginate(any(), any())).thenReturn(expected);
 
         assertEquals(expected, service.findBookingsByOwner(1L, State.CURRENT, -1, -1));
     }
@@ -334,6 +343,7 @@ class BookingServiceImplTest {
         List<Booking> expected = List.of(booking);
         when(bookingRepo.findByItemOwnerIdAndStartGreaterThanEqual(any(), any(), any()))
                 .thenReturn(expected);
+        when(paginator.paginate(any(), any())).thenReturn(expected);
 
         assertEquals(expected, service.findBookingsByOwner(1L, State.FUTURE, -1, -1));
     }
@@ -346,6 +356,7 @@ class BookingServiceImplTest {
         List<Booking> expected = List.of(booking);
         when(bookingRepo.findByItemOwnerIdAndEndLessThanEqual(any(), any(), any()))
                 .thenReturn(expected);
+        when(paginator.paginate(any(), any())).thenReturn(expected);
 
         assertEquals(expected, service.findBookingsByOwner(1L, State.PAST, -1, -1));
     }
@@ -358,6 +369,7 @@ class BookingServiceImplTest {
         List<Booking> expected = List.of(booking);
         when(bookingRepo.findByItemOwnerIdAndStatus(any(), any(), any()))
                 .thenReturn(expected);
+        when(paginator.paginate(any(), any())).thenReturn(expected);
 
         assertEquals(expected, service.findBookingsByOwner(1L, State.REJECTED, -1, -1));
     }
@@ -370,6 +382,7 @@ class BookingServiceImplTest {
         List<Booking> expected = List.of(booking);
         when(bookingRepo.findByItemOwnerIdAndStatus(any(), any(), any()))
                 .thenReturn(expected);
+        when(paginator.paginate(any(), any())).thenReturn(expected);
 
         assertEquals(expected, service.findBookingsByOwner(1L, State.WAITING, -1, -1));
     }
@@ -382,6 +395,7 @@ class BookingServiceImplTest {
         List<Booking> expected = List.of(booking);
         when(bookingRepo.findByItemOwnerIdOrderByStartDesc(any()))
                 .thenReturn(expected);
+        when(paginator.paginate(any(), any())).thenReturn(expected);
 
         assertEquals(expected, service.findBookingsByOwner(1L, State.ALL, -1, -1));
     }

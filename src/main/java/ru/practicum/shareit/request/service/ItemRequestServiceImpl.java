@@ -38,7 +38,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     Paginator<ItemRequest> paginator;
 
     public List<ItemRequest> findAll(Long userId) {
-        User user = userService.findById(userId);
+        userService.findById(userId);
         Sort sort = Sort.by(Sort.Direction.DESC, "created");
         List<ItemRequest> result = itemRequestRepo.findByRequestorId(userId, sort);
         return addItemsToItemRequests(result);
@@ -89,7 +89,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         for (ItemRequest itemRequest : itemRequests) {
             itemRequest.setItems(items.getOrDefault(itemRequest, Collections.emptyList()));
         }
-
         return itemRequests;
     }
 

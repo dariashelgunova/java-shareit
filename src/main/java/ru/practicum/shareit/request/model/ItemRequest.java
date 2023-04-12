@@ -10,9 +10,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * TODO Sprint add-item-requests.
- */
 @Entity
 @Getter
 @Setter
@@ -27,7 +24,7 @@ public class ItemRequest {
     Long id;
     String description;
     LocalDateTime created;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "requestor_id")
     User requestor;
     @Transient

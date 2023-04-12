@@ -34,10 +34,10 @@ public class Item {
     @NotNull
     @Column(name = "is_available")
     Boolean available;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "owner_id")
     User owner;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "request_id")
     ItemRequest request;
     @Transient
