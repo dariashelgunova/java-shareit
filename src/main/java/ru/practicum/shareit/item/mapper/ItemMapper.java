@@ -1,9 +1,7 @@
 package ru.practicum.shareit.item.mapper;
 
 import lombok.experimental.UtilityClass;
-import ru.practicum.shareit.item.comment.model.Comment;
 import ru.practicum.shareit.item.dto.ItemDtoForOwner;
-import ru.practicum.shareit.item.dto.ItemDtoWithComments;
 import ru.practicum.shareit.item.dto.ItemRequestDto;
 import ru.practicum.shareit.item.dto.ItemSimpleDto;
 import ru.practicum.shareit.item.model.Item;
@@ -43,7 +41,6 @@ public class ItemMapper {
             itemRequestDto.setRequestId(item.getRequest().getId());
         }
 
-
         return itemRequestDto;
     }
 
@@ -54,19 +51,6 @@ public class ItemMapper {
                 .stream()
                 .map(ItemMapper::toItemRequestDto)
                 .collect(Collectors.toList());
-    }
-
-    public static ItemDtoWithComments toItemDtoWithComments(Item item, List<Comment> comments) {
-        if (item == null) return null;
-
-        ItemDtoWithComments itemDto = new ItemDtoWithComments();
-        itemDto.setId(item.getId());
-        itemDto.setName(item.getName());
-        itemDto.setDescription(item.getDescription());
-        itemDto.setAvailable(item.getAvailable());
-        itemDto.setComments(toCommentSimpleDtoList(comments));
-
-        return itemDto;
     }
 
     public static ItemDtoForOwner toItemDtoForOwner(Item item) {
@@ -102,14 +86,4 @@ public class ItemMapper {
 
         return itemDto;
     }
-
-    public static List<ItemSimpleDto> toItemSimpleDtoList(List<Item> items) {
-        if (items == null) return null;
-
-        return items
-                .stream()
-                .map(ItemMapper::toItemSimpleDto)
-                .collect(Collectors.toList());
-    }
-
 }

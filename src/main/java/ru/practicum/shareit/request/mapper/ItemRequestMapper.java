@@ -45,7 +45,6 @@ public class ItemRequestMapper {
                 .collect(Collectors.toList());
     }
 
-
     public static ItemRequestToReturnDto toItemRequestToReturnDto(ItemRequest itemRequest) {
         if (itemRequest == null) return null;
 

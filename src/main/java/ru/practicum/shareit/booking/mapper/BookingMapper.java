@@ -42,15 +42,6 @@ public class BookingMapper {
         return bookingRequestDto;
     }
 
-    public static List<BookingRequestDto> toBookingRequestDtoList(List<Booking> bookings) {
-        if (bookings == null) return null;
-
-        return bookings
-                .stream()
-                .map(BookingMapper::toBookingRequestDto)
-                .collect(Collectors.toList());
-    }
-
     public static BookingDtoToReturn toBookingDtoToReturn(Booking booking) {
         if (booking == null) return null;
 
@@ -82,14 +73,5 @@ public class BookingMapper {
         bookingDto.setBookerId(booking.getBooker().getId());
 
         return bookingDto;
-    }
-
-    public static List<BookingSimpleDto> toBookingSimpleDtoList(List<Booking> bookings) {
-        if (bookings == null) return null;
-
-        return bookings
-                .stream()
-                .map(BookingMapper::toBookingSimpleDto)
-                .collect(Collectors.toList());
     }
 }

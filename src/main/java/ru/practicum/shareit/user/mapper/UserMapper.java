@@ -59,6 +59,4 @@ public class UserMapper {
                 .map(UserMapper::toUserSimpleDto)
                 .collect(Collectors.toList());
     }
-
-
 }
