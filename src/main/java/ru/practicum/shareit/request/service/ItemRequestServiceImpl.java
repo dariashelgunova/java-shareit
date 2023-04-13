@@ -9,8 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundObjectException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
-import ru.practicum.shareit.paginator.Page;
-import ru.practicum.shareit.paginator.Paginator;
+import ru.practicum.shareit.pageable.OffsetBasedPageRequest;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repo.ItemRequestRepo;
 import ru.practicum.shareit.user.model.User;
@@ -35,7 +34,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     ItemService itemService;
 
-    Paginator<ItemRequest> paginator;
 
     public List<ItemRequest> findAll(Long userId) {
         userService.findById(userId);
@@ -54,8 +52,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     public List<ItemRequest> findRequestsCreatedByUsers(Integer from, Integer size, Long userId) {
         Sort sort = Sort.by(Sort.Direction.DESC, "created");
-        List<ItemRequest> all = itemRequestRepo.findByRequestorIdNot(userId, sort);
-        List<ItemRequest> result = paginator.paginate(new Page(from, size), all);
+        List<ItemRequest> result = itemRequestRepo.findByRequestorIdNot(userId, new OffsetBasedPageRequest(size, from, sort));
         return addItemsToItemRequests(result);
     }
 

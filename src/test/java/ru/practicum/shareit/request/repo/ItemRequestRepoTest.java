@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Sort;
+import ru.practicum.shareit.pageable.OffsetBasedPageRequest;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repo.UserRepo;
@@ -43,7 +44,7 @@ class ItemRequestRepoTest {
         createdRequest = repo.save(itemRequest);
 
         Sort sort = Sort.by(Sort.Direction.DESC, "created");
-        assertEquals(0, repo.findByRequestorIdNot(requestor.getId(), sort).size());
+        assertEquals(0, repo.findByRequestorIdNot(requestor.getId(), new OffsetBasedPageRequest(10, 0, sort)).size());
     }
 
     private User createUser(Long id) {

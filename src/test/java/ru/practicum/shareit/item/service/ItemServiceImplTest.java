@@ -15,7 +15,7 @@ import ru.practicum.shareit.item.comment.repo.CommentRepo;
 import ru.practicum.shareit.item.comment.service.CommentService;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repo.ItemRepo;
-import ru.practicum.shareit.paginator.Paginator;
+import ru.practicum.shareit.pageable.OffsetBasedPageRequest;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -39,8 +39,6 @@ public class ItemServiceImplTest {
     BookingService bookingService;
     @Mock
     CommentRepo commentRepo;
-    @Mock
-    Paginator<Item> itemPaginator;
     @Mock
     CommentService commentService;
 
@@ -194,9 +192,9 @@ public class ItemServiceImplTest {
     @Test
     public void givenOwnerId_whenNoItemsFound_thenThrowNotFoundObjectException() {
         long ownerId = 1L;
-        when(itemRepo.findByOwnerId(ownerId)).thenReturn(Collections.emptyList());
+        when(itemRepo.findByOwnerId(ownerId, new OffsetBasedPageRequest(10, 0, null))).thenReturn(Collections.emptyList());
 
-        assertThrows(NotFoundObjectException.class, () -> service.findItemsByOwner(ownerId, -1, -1));
+        assertThrows(NotFoundObjectException.class, () -> service.findItemsByOwner(ownerId, 0, 10));
     }
 
     @Test
@@ -204,10 +202,9 @@ public class ItemServiceImplTest {
         long itemId = 1L;
         long ownerId = 1L;
         List<Item> expected = List.of(createItemWithOwner(itemId, ownerId));
-        when(itemRepo.findByOwnerId(ownerId)).thenReturn(expected);
-        when(itemPaginator.paginate(any(), any())).thenReturn(expected);
+        when(itemRepo.findByOwnerId(ownerId, new OffsetBasedPageRequest(10, 0, null))).thenReturn(expected);
 
-        List<Item> itemsByOwner = service.findItemsByOwner(ownerId, -1, -1);
+        List<Item> itemsByOwner = service.findItemsByOwner(ownerId, 0, 10);
 
         assertEquals(1, itemsByOwner.size());
     }
@@ -216,7 +213,7 @@ public class ItemServiceImplTest {
     public void givenBlankRequestText_whenFindingItemsByEmptyText_thenReturnEmptyList() {
         String emptyRequestText = "";
 
-        List<Item> foundItems = service.findItemsBySearch(emptyRequestText, -1, -1);
+        List<Item> foundItems = service.findItemsBySearch(emptyRequestText, 0, 10);
 
         assertTrue(foundItems.isEmpty());
     }
@@ -224,21 +221,20 @@ public class ItemServiceImplTest {
     @Test
     public void givenRequestText_whenNoItemsFoundBySearch_thenThrowNotFoundObjectException() {
         String requestText = "text";
-        when(itemRepo.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailable(requestText, requestText, true))
+        when(itemRepo.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailable(requestText, requestText, true, new OffsetBasedPageRequest(10, 0, null)))
                 .thenReturn(Collections.emptyList());
 
-        assertThrows(NotFoundObjectException.class, () -> service.findItemsBySearch(requestText, -1, -1));
+        assertThrows(NotFoundObjectException.class, () -> service.findItemsBySearch(requestText, 0, 10));
     }
 
     @Test
     public void givenRequestText_whenItemsFoundBySearch_thenReturnFoundItems() {
         String requestText = "text";
         List<Item> expected = List.of(createItemWithOwner(1L, 1L));
-        when(itemRepo.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailable(requestText, requestText, true))
+        when(itemRepo.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailable(requestText, requestText, true, new OffsetBasedPageRequest(10, 0, null)))
                 .thenReturn(expected);
-        when(itemPaginator.paginate(any(), any())).thenReturn(expected);
 
-        List<Item> foundItems = service.findItemsBySearch(requestText, -1, -1);
+        List<Item> foundItems = service.findItemsBySearch(requestText, 0, 10);
 
         assertEquals(1, foundItems.size());
     }

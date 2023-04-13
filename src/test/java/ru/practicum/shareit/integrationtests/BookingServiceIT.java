@@ -84,7 +84,7 @@ public class BookingServiceIT {
     @Test
     public void givenUserId_whenFindingBookingsByUser_thenReturn2Bookings() {
         Long bookerId = booker.getId();
-        List<Booking> result = bookingService.findBookingsByUser(bookerId, State.ALL, -1, -1);
+        List<Booking> result = bookingService.findBookingsByUser(bookerId, State.ALL, 0, 10);
         List<Booking> expected = List.of(createdBooking1, createdBooking2);
 
         assertEquals(expected.size(), result.size());
@@ -93,7 +93,7 @@ public class BookingServiceIT {
     @Test
     public void givenUserId_whenFindingBookingsByOwner_thenReturn2Bookings() {
         Long ownerId = owner.getId();
-        List<Booking> result = bookingService.findBookingsByOwner(ownerId, State.ALL, -1, -1);
+        List<Booking> result = bookingService.findBookingsByOwner(ownerId, State.ALL, 0, 10);
         List<Booking> expected = List.of(createdBooking1, createdBooking2);
 
         assertEquals(expected.size(), result.size());

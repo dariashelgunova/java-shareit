@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repo.ItemRepo;
+import ru.practicum.shareit.pageable.OffsetBasedPageRequest;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repo.ItemRequestRepo;
 import ru.practicum.shareit.user.model.User;
@@ -48,17 +49,17 @@ class ItemRepoTest {
 
     @Test
     public void givenItem_whenFindingByOwnerId_thenReturnItem() {
-        assertEquals(1, itemRepo.findByOwnerId(owner.getId()).size());
+        assertEquals(1, itemRepo.findByOwnerId(owner.getId(), new OffsetBasedPageRequest(10, 0, null)).size());
     }
 
     @Test
     public void givenItem_whenFindingBySearchDescription_thenReturnItem() {
-        assertEquals(1, itemRepo.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailable("description", "description", true).size());
+        assertEquals(1, itemRepo.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailable("description", "description", true, new OffsetBasedPageRequest(10, 0, null)).size());
     }
 
     @Test
     public void givenItem_whenFindingBySearchName_thenReturnItem() {
-        assertEquals(1, itemRepo.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailable("Name", "Name", true).size());
+        assertEquals(1, itemRepo.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailable("Name", "Name", true, new OffsetBasedPageRequest(10, 0, null)).size());
     }
 
     @Test

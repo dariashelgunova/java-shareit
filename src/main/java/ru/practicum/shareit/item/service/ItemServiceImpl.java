@@ -17,8 +17,7 @@ import ru.practicum.shareit.item.comment.repo.CommentRepo;
 import ru.practicum.shareit.item.comment.service.CommentService;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repo.ItemRepo;
-import ru.practicum.shareit.paginator.Page;
-import ru.practicum.shareit.paginator.Paginator;
+import ru.practicum.shareit.pageable.OffsetBasedPageRequest;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -40,8 +39,6 @@ public class ItemServiceImpl implements ItemService {
     CommentRepo commentRepo;
     CommentService commentService;
     BookingService bookingService;
-
-    Paginator<Item> paginator;
 
     public List<Item> findAll() {
         return itemRepo.findAll();
@@ -80,8 +77,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     public List<Item> findItemsByOwner(Long ownerId, Integer from, Integer size) {
-        List<Item> all = itemRepo.findByOwnerId(ownerId);
-        List<Item> result = paginator.paginate(new Page(from, size), all);
+        List<Item> result = itemRepo.findByOwnerId(ownerId, new OffsetBasedPageRequest(size, from, null));
         if (result.isEmpty()) {
             throw new NotFoundObjectException("По вашему запросу ничего найдено.");
         } else {
@@ -91,8 +87,7 @@ public class ItemServiceImpl implements ItemService {
 
     public List<Item> findItemsBySearch(String requestText, Integer from, Integer size) {
         if (StringUtils.isBlank(requestText)) return Collections.emptyList();
-        List<Item> all = itemRepo.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailable(requestText, requestText, true);
-        List<Item> result = paginator.paginate(new Page(from, size), all);
+        List<Item> result = itemRepo.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailable(requestText, requestText, true, new OffsetBasedPageRequest(size, from, null));
         if (result.isEmpty()) {
             throw new NotFoundObjectException("По вашему запросу ничего найдено.");
         } else {

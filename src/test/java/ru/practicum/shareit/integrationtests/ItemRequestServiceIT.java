@@ -71,7 +71,7 @@ public class ItemRequestServiceIT {
     public void givenExistingRequest_whenFindingRequestsCreatedByOthersByOwner_thenReturnRequest() {
         Long ownerId = owner.getId();
 
-        assertEquals(createdRequest, itemRequestService.findRequestsCreatedByUsers(-1, -1, ownerId).get(0));
+        assertEquals(createdRequest, itemRequestService.findRequestsCreatedByUsers(0, 10, ownerId).get(0));
     }
 
     @Test

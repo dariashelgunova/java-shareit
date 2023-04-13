@@ -25,7 +25,7 @@ public class Booking {
     LocalDateTime start;
     @Column(name = "end_date")
     LocalDateTime end;
-    @OneToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "item_id")
     Item item;
     @ManyToOne(cascade = CascadeType.REMOVE)

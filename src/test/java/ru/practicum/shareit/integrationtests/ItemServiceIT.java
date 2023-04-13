@@ -111,14 +111,14 @@ public class ItemServiceIT {
     public void givenExistingItem_whenFindingByOwner_thenReturnItem() {
         Long ownerId = owner.getId();
 
-        assertEquals(createdItem1, itemService.findItemsByOwner(ownerId, -1, -1).get(0));
+        assertEquals(createdItem1, itemService.findItemsByOwner(ownerId, 0, 10).get(0));
     }
 
     @Test
     public void givenExistingItem_whenFindingBySearch_thenReturnItem() {
         String searchText = "description";
 
-        assertEquals(createdItem1, itemService.findItemsBySearch(searchText, -1, -1).get(0));
+        assertEquals(createdItem1, itemService.findItemsBySearch(searchText, 0, 10).get(0));
     }
 
     @Test

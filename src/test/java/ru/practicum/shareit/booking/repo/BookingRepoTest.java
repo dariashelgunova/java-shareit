@@ -9,6 +9,7 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repo.ItemRepo;
+import ru.practicum.shareit.pageable.OffsetBasedPageRequest;
 import ru.practicum.shareit.request.repo.ItemRequestRepo;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repo.UserRepo;
@@ -36,6 +37,7 @@ class BookingRepoTest {
     private Booking createdBooking2;
     private Item createdItem;
     private Sort sort = Sort.by(Sort.Direction.DESC, "start");
+    private OffsetBasedPageRequest pageRequest = new OffsetBasedPageRequest(10, 0, sort);
 
 
     @BeforeEach
@@ -60,60 +62,60 @@ class BookingRepoTest {
     public void givenBooking_whenFindingByBookerIdAndCurrentState_thenReturnBookingList() {
         LocalDateTime start = LocalDateTime.now().plus(1, ChronoUnit.HOURS);
         LocalDateTime end = LocalDateTime.now().plus(9, ChronoUnit.HOURS);
-        assertEquals(1, bookingRepo.findByBookerIdAndStartLessThanEqualAndEndGreaterThanEqual(booker.getId(), start, end, sort).size());
+        assertEquals(1, bookingRepo.findByBookerIdAndStartLessThanEqualAndEndGreaterThanEqual(booker.getId(), start, end, pageRequest).size());
     }
 
     @Test
     public void givenBooking_whenFindingByBookerIdAndFutureState_thenReturnBookingList() {
         LocalDateTime start = LocalDateTime.now().minus(1, ChronoUnit.HOURS);
-        assertEquals(2, bookingRepo.findByBookerIdAndStartGreaterThanEqual(booker.getId(), start, sort).size());
+        assertEquals(2, bookingRepo.findByBookerIdAndStartGreaterThanEqual(booker.getId(), start, pageRequest).size());
     }
 
     @Test
     public void givenBooking_whenFindingByBookerIdAndPastState_thenReturnBookingList() {
         LocalDateTime end = LocalDateTime.now().plus(11, ChronoUnit.HOURS);
-        assertEquals(1, bookingRepo.findByBookerIdAndEndLessThanEqual(booker.getId(), end, sort).size());
+        assertEquals(1, bookingRepo.findByBookerIdAndEndLessThanEqual(booker.getId(), end, pageRequest).size());
     }
 
     @Test
     public void givenBooking_whenFindingByBookerIdAndStatus_thenReturnBookingList() {
-        assertEquals(2, bookingRepo.findByBookerIdAndStatus(booker.getId(), Status.WAITING, sort).size());
+        assertEquals(2, bookingRepo.findByBookerIdAndStatus(booker.getId(), Status.WAITING, pageRequest).size());
     }
 
     @Test
     public void givenBooking_whenFindingByBookerIdAndOrderByStartDesc_thenReturnBookingListInOrder() {
-        assertEquals(createdBooking1, bookingRepo.findByBookerIdOrderByStartDesc(booker.getId()).get(1));
-        assertEquals(createdBooking2, bookingRepo.findByBookerIdOrderByStartDesc(booker.getId()).get(0));
+        assertEquals(createdBooking1, bookingRepo.findByBookerId(booker.getId(), pageRequest).get(1));
+        assertEquals(createdBooking2, bookingRepo.findByBookerId(booker.getId(), pageRequest).get(0));
     }
 
     @Test
     public void givenBooking_whenFindingByOwnerIdAndCurrentState_thenReturnBookingList() {
         LocalDateTime start = LocalDateTime.now().plus(1, ChronoUnit.HOURS);
         LocalDateTime end = LocalDateTime.now().plus(9, ChronoUnit.HOURS);
-        assertEquals(1, bookingRepo.findByItemOwnerIdAndStartLessThanEqualAndEndGreaterThanEqual(owner.getId(), start, end, sort).size());
+        assertEquals(1, bookingRepo.findByItemOwnerIdAndStartLessThanEqualAndEndGreaterThanEqual(owner.getId(), start, end, pageRequest).size());
     }
 
     @Test
     public void givenBooking_whenFindingByOwnerIdAndFutureState_thenReturnBookingList() {
         LocalDateTime start = LocalDateTime.now().minus(1, ChronoUnit.HOURS);
-        assertEquals(2, bookingRepo.findByItemOwnerIdAndStartGreaterThanEqual(owner.getId(), start, sort).size());
+        assertEquals(2, bookingRepo.findByItemOwnerIdAndStartGreaterThanEqual(owner.getId(), start, pageRequest).size());
     }
 
     @Test
     public void givenBooking_whenFindingByOwnerIdAndPastState_thenReturnBookingList() {
         LocalDateTime end = LocalDateTime.now().plus(11, ChronoUnit.HOURS);
-        assertEquals(1, bookingRepo.findByItemOwnerIdAndEndLessThanEqual(owner.getId(), end, sort).size());
+        assertEquals(1, bookingRepo.findByItemOwnerIdAndEndLessThanEqual(owner.getId(), end, pageRequest).size());
     }
 
     @Test
     public void givenBooking_whenFindingByOwnerIdAndStatus_thenReturnBookingList() {
-        assertEquals(2, bookingRepo.findByItemOwnerIdAndStatus(owner.getId(), Status.WAITING, sort).size());
+        assertEquals(2, bookingRepo.findByItemOwnerIdAndStatus(owner.getId(), Status.WAITING, pageRequest).size());
     }
 
     @Test
     public void givenBooking_whenFindingByOwnerIdAndOrderByStartDesc_thenReturnBookingListInOrder() {
-        assertEquals(createdBooking1, bookingRepo.findByItemOwnerIdOrderByStartDesc(owner.getId()).get(1));
-        assertEquals(createdBooking2, bookingRepo.findByItemOwnerIdOrderByStartDesc(owner.getId()).get(0));
+        assertEquals(createdBooking1, bookingRepo.findByItemOwnerId(owner.getId(), pageRequest).get(1));
+        assertEquals(createdBooking2, bookingRepo.findByItemOwnerId(owner.getId(), pageRequest).get(0));
     }
 
     @Test

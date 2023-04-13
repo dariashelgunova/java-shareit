@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.repo;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import ru.practicum.shareit.booking.model.Booking;
@@ -10,25 +11,27 @@ import java.util.List;
 
 public interface BookingRepo extends JpaRepository<Booking, Long> {
 
-    List<Booking> findByBookerIdAndStartLessThanEqualAndEndGreaterThanEqual(Long bookerId, LocalDateTime start, LocalDateTime end, Sort sort);
+    List<Booking> findByBookerIdAndStartLessThanEqualAndEndGreaterThanEqual(Long bookerId, LocalDateTime start, LocalDateTime end, Pageable pageRequest);
 
-    List<Booking> findByBookerIdAndStartGreaterThanEqual(Long bookerId, LocalDateTime start, Sort sort);
+    List<Booking> findByBookerIdAndStartGreaterThanEqual(Long bookerId, LocalDateTime start, Pageable pageRequest);
 
-    List<Booking> findByBookerIdAndEndLessThanEqual(Long bookerId, LocalDateTime end, Sort sort);
+    List<Booking> findByBookerIdAndEndLessThanEqual(Long bookerId, LocalDateTime end, Pageable pageRequest);
 
-    List<Booking> findByBookerIdAndStatus(Long bookerId, Status status, Sort sort);
+    List<Booking> findByBookerIdAndStatus(Long bookerId, Status status, Pageable pageRequest);
 
-    List<Booking> findByBookerIdOrderByStartDesc(Long bookerId);
+    List<Booking> findByBookerId(Long bookerId, Pageable pageRequest);
 
-    List<Booking> findByItemOwnerIdAndStartLessThanEqualAndEndGreaterThanEqual(Long itemOwnerId, LocalDateTime start, LocalDateTime end, Sort sort);
+    List<Booking> findByItemOwnerIdAndStartLessThanEqualAndEndGreaterThanEqual(Long itemOwnerId, LocalDateTime start, LocalDateTime end, Pageable pageRequest);
 
-    List<Booking> findByItemOwnerIdAndStartGreaterThanEqual(Long itemOwnerId, LocalDateTime start, Sort sort);
+    List<Booking> findByItemOwnerIdAndStartGreaterThanEqual(Long itemOwnerId, LocalDateTime start, Pageable pageRequest);
 
-    List<Booking> findByItemOwnerIdAndEndLessThanEqual(Long itemOwnerId, LocalDateTime end, Sort sort);
+    List<Booking> findByItemOwnerIdAndEndLessThanEqual(Long itemOwnerId, LocalDateTime end, Pageable pageRequest);
 
-    List<Booking> findByItemOwnerIdAndStatus(Long itemOwnerId, Status status, Sort sort);
+    List<Booking> findByItemOwnerIdAndStatus(Long itemOwnerId, Status status, Pageable pageRequest);
 
-    List<Booking> findByItemOwnerIdOrderByStartDesc(Long itemOwnerId);
+    List<Booking> findByItemOwnerId(Long itemOwnerId, Pageable pageRequest);
+
+
 
     Booking findFirstByItemIdAndStartLessThanEqualAndStatus(Long itemId, LocalDateTime start, Status status, Sort sort);
 

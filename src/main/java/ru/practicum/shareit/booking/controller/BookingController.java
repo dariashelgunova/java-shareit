@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking.controller;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDtoToReturn;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
@@ -15,10 +16,13 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 import static ru.practicum.shareit.booking.mapper.BookingMapper.*;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/bookings")
@@ -53,8 +57,8 @@ public class BookingController {
     }
 
     @GetMapping
-    public List<BookingDtoToReturn> findBookingsByUser(@RequestParam(defaultValue = "-1") Integer from,
-                                                       @RequestParam(defaultValue = "-1") Integer size,
+    public List<BookingDtoToReturn> findBookingsByUser(@PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                                       @Positive @RequestParam(defaultValue = "10") Integer size,
                                                        @RequestHeader("X-Sharer-User-Id") Long userId,
                                                        @RequestParam(defaultValue = "ALL") String state) {
         State stateEnum = State.findByValueOrThrowException(state);
@@ -62,8 +66,8 @@ public class BookingController {
     }
 
     @GetMapping("/owner")
-    public List<BookingDtoToReturn> findBookingsByOwner(@RequestParam(defaultValue = "-1") Integer from,
-                                                        @RequestParam(defaultValue = "-1") Integer size,
+    public List<BookingDtoToReturn> findBookingsByOwner(@PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                                        @Positive @RequestParam(defaultValue = "10") Integer size,
                                                         @RequestHeader("X-Sharer-User-Id") Long userId,
                                                         @RequestParam(defaultValue = "ALL") String state) {
         State stateEnum = State.findByValueOrThrowException(state);

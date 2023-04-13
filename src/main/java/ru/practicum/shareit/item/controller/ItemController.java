@@ -21,12 +21,15 @@ import ru.practicum.shareit.validation.Create;
 import ru.practicum.shareit.validation.Update;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 import static ru.practicum.shareit.item.comment.mapper.CommentMapper.fromCommentRequestDto;
 import static ru.practicum.shareit.item.comment.mapper.CommentMapper.toCommentRequestDto;
 import static ru.practicum.shareit.item.mapper.ItemMapper.*;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/items")
@@ -75,16 +78,16 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDtoForOwner> findItemsByOwner(@RequestParam(defaultValue = "-1") Integer from,
-                                                  @RequestParam(defaultValue = "-1") Integer size,
+    public List<ItemDtoForOwner> findItemsByOwner(@PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                                  @Positive @RequestParam(defaultValue = "10") Integer size,
                                                   @RequestHeader("X-Sharer-User-Id") Long userId) {
         List<Item> itemsByOwner = itemService.findItemsByOwner(userId, from, size);
         return toItemDtoForOwnerList(itemService.addCommentsAndBookingsToItems(itemsByOwner, userId));
     }
 
     @GetMapping("/search")
-    public List<ItemRequestDto> findItemsBySearch(@RequestParam(defaultValue = "-1") Integer from,
-                                                  @RequestParam(defaultValue = "-1") Integer size,
+    public List<ItemRequestDto> findItemsBySearch(@PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                                  @Positive @RequestParam(defaultValue = "10") Integer size,
                                                   @RequestParam String text) {
         return toItemRequestDtoList(itemService.findItemsBySearch(text, from, size));
     }

@@ -9,7 +9,7 @@ import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.exception.NotFoundObjectException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
-import ru.practicum.shareit.paginator.Paginator;
+import ru.practicum.shareit.pageable.OffsetBasedPageRequest;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repo.ItemRequestRepo;
 import ru.practicum.shareit.user.model.User;
@@ -34,8 +34,7 @@ class ItemRequestServiceImplTest {
     UserService userService;
     @Mock
     ItemService itemService;
-    @Mock
-    Paginator<ItemRequest> paginator;
+
 
     @Test
     public void givenUserId_whenFindingAllWithWrongUserId_thenThrowNotFoundObjectException() {
@@ -77,10 +76,10 @@ class ItemRequestServiceImplTest {
 
     @Test
     public void givenUserId_whenFindRequestsCreatedByUsers_thenInvokeItemRequestRepo() {
-        service.findRequestsCreatedByUsers(-1, -1, 1L);
+        service.findRequestsCreatedByUsers(0, 10, 1L);
         Sort sort = Sort.by(Sort.Direction.DESC, "created");
 
-        verify(itemRequestRepo, times(1)).findByRequestorIdNot(1L, sort);
+        verify(itemRequestRepo, times(1)).findByRequestorIdNot(1L, new OffsetBasedPageRequest(10, 0, sort));
     }
 
     @Test
