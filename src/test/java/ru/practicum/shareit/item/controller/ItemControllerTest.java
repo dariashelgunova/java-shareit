@@ -15,6 +15,7 @@ import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.repo.BookingRepo;
 import ru.practicum.shareit.item.comment.dto.CommentDtoToReturn;
 import ru.practicum.shareit.item.comment.dto.CommentRequestDto;
+import ru.practicum.shareit.item.comment.dto.CommentSimpleDto;
 import ru.practicum.shareit.item.comment.model.Comment;
 import ru.practicum.shareit.item.comment.repo.CommentRepo;
 import ru.practicum.shareit.item.dto.ItemDtoForOwner;
@@ -24,12 +25,13 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repo.db.UserRepo;
+import ru.practicum.shareit.user.repo.UserRepo;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -39,7 +41,9 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ru.practicum.shareit.item.comment.mapper.CommentMapper.toCommentSimpleDto;
+import static ru.practicum.shareit.item.comment.mapper.CommentMapper.toCommentSimpleDtoList;
+import static ru.practicum.shareit.item.mapper.ItemMapper.toItemDtoForOwnerList;
+import static ru.practicum.shareit.item.mapper.ItemMapper.toItemRequestDto;
 
 @ExtendWith(MockitoExtension.class)
 class ItemControllerTest {
@@ -104,7 +108,7 @@ class ItemControllerTest {
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
-        assertEquals(mapper.writeValueAsString(itemRequestDto), response);
+        assertEquals(mapper.writeValueAsString(toItemRequestDto(item)), response);
     }
 
     @Test
@@ -130,7 +134,8 @@ class ItemControllerTest {
 
     @Test
     public void givenItemDto_whenFindingById_thenStatus200andItemReturned() throws Exception {
-        itemDtoForOwner.setComments(Collections.singletonList(toCommentSimpleDto(comment)));
+        List<CommentSimpleDto> result = toCommentSimpleDtoList(Collections.singletonList(comment));
+        itemDtoForOwner.setComments(result);
 
         when(itemService.findById(any())).thenReturn(item);
         item.setComments(Collections.singletonList(comment));
@@ -173,7 +178,9 @@ class ItemControllerTest {
 
     @Test
     public void givenItemDto_whenFindingItemsByOwner_thenStatus200andItemListReturned() throws Exception {
-        when(itemService.findItemsByOwner(any(), any(), any())).thenReturn(Collections.singletonList(item));
+        List<Item> result = Collections.singletonList(item);
+
+        when(itemService.findItemsByOwner(any(), any(), any())).thenReturn(result);
         when(itemService.addCommentsAndBookingsToItems(any(), any())).thenReturn(Collections.singletonList(item));
         String response = mvc.perform(get("/items")
                         .contentType("application/json")
@@ -183,7 +190,7 @@ class ItemControllerTest {
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
-        assertEquals(mapper.writeValueAsString(Collections.singletonList(itemDtoForOwner)), response);
+        assertEquals(mapper.writeValueAsString(toItemDtoForOwnerList(result)), response);
     }
 
     @Test

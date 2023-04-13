@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.exception.NotFoundObjectException;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repo.db.UserRepo;
+import ru.practicum.shareit.user.repo.UserRepo;
 
 import java.util.Collections;
 import java.util.Optional;

@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.web.context.WebApplicationContext;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repo.db.UserRepo;
+import ru.practicum.shareit.user.repo.UserRepo;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.util.List;

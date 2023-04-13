@@ -16,7 +16,7 @@ import ru.practicum.shareit.item.comment.model.Comment;
 import ru.practicum.shareit.item.comment.repo.CommentRepo;
 import ru.practicum.shareit.item.comment.service.CommentService;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.repo.db.ItemRepo;
+import ru.practicum.shareit.item.repo.ItemRepo;
 import ru.practicum.shareit.paginator.Page;
 import ru.practicum.shareit.paginator.Paginator;
 import ru.practicum.shareit.user.model.User;

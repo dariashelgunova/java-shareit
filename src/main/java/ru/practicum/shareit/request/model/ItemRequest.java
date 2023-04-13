@@ -8,12 +8,12 @@ import ru.practicum.shareit.user.model.User;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 @Getter
 @Setter
-@ToString(exclude = {"requestor"})
+@ToString(exclude = {"requestor", "items"})
+@EqualsAndHashCode(exclude = {"requestor", "items"})
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "requests")
@@ -29,18 +29,4 @@ public class ItemRequest {
     User requestor;
     @Transient
     List<Item> items;
-
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ItemRequest that = (ItemRequest) o;
-        return id.equals(that.id) && Objects.equals(requestor, that.requestor);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, requestor);
-    }
 }

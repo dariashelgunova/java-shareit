@@ -11,16 +11,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.repo.db.ItemRepo;
+import ru.practicum.shareit.item.repo.ItemRepo;
 import ru.practicum.shareit.request.dto.ItemRequestRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestToReturnDto;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repo.db.UserRepo;
+import ru.practicum.shareit.user.repo.UserRepo;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -31,6 +32,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.practicum.shareit.request.mapper.ItemRequestMapper.toItemRequestToReturnDto;
+import static ru.practicum.shareit.request.mapper.ItemRequestMapper.toItemRequestToReturnDtoList;
 
 @ExtendWith(MockitoExtension.class)
 class ItemRequestControllerTest {
@@ -87,7 +89,9 @@ class ItemRequestControllerTest {
 
     @Test
     public void givenRequestDto_whenFindingRequestsCreatedByOtherUsers_thenStatus200andRequestReturned() throws Exception {
-        when(itemRequestService.findRequestsCreatedByUsers(any(), any(), any())).thenReturn(Collections.singletonList(request));
+        List<ItemRequest> result = Collections.singletonList(request);
+
+        when(itemRequestService.findRequestsCreatedByUsers(any(), any(), any())).thenReturn(result);
         String response = mvc.perform(get("/requests/all")
                         .contentType("application/json")
                         .header("X-Sharer-User-Id", 1))
@@ -96,12 +100,14 @@ class ItemRequestControllerTest {
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
-        assertEquals(mapper.writeValueAsString(Collections.singletonList(itemRequestToReturnDto)), response);
+        assertEquals(mapper.writeValueAsString(toItemRequestToReturnDtoList(result)), response);
     }
 
     @Test
     public void givenRequestDto_whenFindAll_thenStatus200andRequestListReturned() throws Exception {
-        when(itemRequestService.findAll(any())).thenReturn(Collections.singletonList(request));
+        List<ItemRequest> result = Collections.singletonList(request);
+
+        when(itemRequestService.findAll(any())).thenReturn(result);
         String response = mvc.perform(get("/requests")
                         .contentType("application/json")
                         .header("X-Sharer-User-Id", 2))
@@ -110,7 +116,7 @@ class ItemRequestControllerTest {
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
-        assertEquals(mapper.writeValueAsString(Collections.singletonList(itemRequestToReturnDto)), response);
+        assertEquals(mapper.writeValueAsString(toItemRequestToReturnDtoList(result)), response);
     }
 
     @Test

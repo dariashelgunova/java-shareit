@@ -12,7 +12,7 @@ import ru.practicum.shareit.booking.repo.BookingRepo;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.item.comment.model.Comment;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.repo.db.ItemRepo;
+import ru.practicum.shareit.item.repo.ItemRepo;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;

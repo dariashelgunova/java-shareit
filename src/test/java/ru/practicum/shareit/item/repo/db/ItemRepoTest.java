@@ -5,10 +5,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.repo.ItemRepo;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repo.ItemRequestRepo;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repo.db.UserRepo;
+import ru.practicum.shareit.user.repo.UserRepo;
 
 import java.time.LocalDateTime;
 import java.util.Collections;

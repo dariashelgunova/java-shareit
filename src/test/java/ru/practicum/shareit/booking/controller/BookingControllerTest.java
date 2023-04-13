@@ -16,15 +16,16 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.repo.db.ItemRepo;
+import ru.practicum.shareit.item.repo.ItemRepo;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repo.db.UserRepo;
+import ru.practicum.shareit.user.repo.UserRepo;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,6 +36,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.practicum.shareit.booking.mapper.BookingMapper.toBookingDtoToReturn;
+import static ru.practicum.shareit.booking.mapper.BookingMapper.toBookingDtoToReturnList;
 
 @ExtendWith(MockitoExtension.class)
 class BookingControllerTest {
@@ -126,7 +128,8 @@ class BookingControllerTest {
 
     @Test
     public void givenBooking_whenFindingByUser_thenStatus200andBookingReturned() throws Exception {
-        when(bookingService.findBookingsByUser(any(), any(), any(), any())).thenReturn(Collections.singletonList(booking));
+        List<Booking> result = Collections.singletonList(booking);
+        when(bookingService.findBookingsByUser(any(), any(), any(), any())).thenReturn(result);
         String response = mvc.perform(get("/bookings")
                         .contentType("application/json")
                         .header("X-Sharer-User-Id", 2))
@@ -135,12 +138,13 @@ class BookingControllerTest {
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
-        assertEquals(mapper.writeValueAsString(Collections.singletonList(bookingDtoToReturn)), response);
+        assertEquals(mapper.writeValueAsString(toBookingDtoToReturnList(result)), response);
     }
 
     @Test
     public void givenBooking_whenFindingByOwner_thenStatus200andBookingReturned() throws Exception {
-        when(bookingService.findBookingsByOwner(any(), any(), any(), any())).thenReturn(Collections.singletonList(booking));
+        List<Booking> result = Collections.singletonList(booking);
+        when(bookingService.findBookingsByOwner(any(), any(), any(), any())).thenReturn(result);
         String response = mvc.perform(get("/bookings/owner")
                         .contentType("application/json")
                         .header("X-Sharer-User-Id", 1))
@@ -149,7 +153,7 @@ class BookingControllerTest {
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
-        assertEquals(mapper.writeValueAsString(Collections.singletonList(bookingDtoToReturn)), response);
+        assertEquals(mapper.writeValueAsString(toBookingDtoToReturnList(result)), response);
     }
 
     private User createUser(Long id) {

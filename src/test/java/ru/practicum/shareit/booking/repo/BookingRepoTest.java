@@ -8,10 +8,10 @@ import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.repo.db.ItemRepo;
+import ru.practicum.shareit.item.repo.ItemRepo;
 import ru.practicum.shareit.request.repo.ItemRequestRepo;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repo.db.UserRepo;
+import ru.practicum.shareit.user.repo.UserRepo;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
