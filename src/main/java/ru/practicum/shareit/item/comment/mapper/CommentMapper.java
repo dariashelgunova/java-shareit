@@ -41,15 +41,6 @@ public class CommentMapper {
         return commentDtoToReturn;
     }
 
-    public static List<CommentDtoToReturn> toCommentRequestDtoList(List<Comment> comments) {
-        if (comments == null) return null;
-
-        return comments
-                .stream()
-                .map(CommentMapper::toCommentRequestDto)
-                .collect(Collectors.toList());
-    }
-
     public static CommentSimpleDto toCommentSimpleDto(Comment comment) {
         if (comment == null) return null;
 

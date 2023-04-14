@@ -18,9 +18,9 @@ public interface ItemService {
 
     void deleteAll();
 
-    List<Item> findItemsByOwner(Long ownerId);
+    List<Item> findItemsByOwner(Long ownerId, Integer from, Integer size);
 
-    List<Item> findItemsBySearch(String requestText);
+    List<Item> findItemsBySearch(String requestText, Integer from, Integer size);
 
     Comment addComment(Long itemId, Long userId, Comment newComment);
 
@@ -28,5 +28,7 @@ public interface ItemService {
 
     List<Item> addCommentsAndBookingsToItems(List<Item> items, Long userId);
 
+    List<Item> findItemsByRequestId(Long requestId);
 
+    List<Item> findItemsByRequestIds(List<Long> requestIds);
 }

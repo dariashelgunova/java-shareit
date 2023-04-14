@@ -2,18 +2,18 @@ package ru.practicum.shareit.request.model;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
-import java.util.Objects;
+import java.time.LocalDateTime;
+import java.util.List;
 
-/**
- * TODO Sprint add-item-requests.
- */
 @Entity
 @Getter
 @Setter
-@ToString
+@ToString(exclude = {"requestor", "items"})
+@EqualsAndHashCode(exclude = {"requestor", "items"})
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "requests")
@@ -22,20 +22,11 @@ public class ItemRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-    @ManyToOne(cascade = CascadeType.ALL)
+    String description;
+    LocalDateTime created;
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "requestor_id")
     User requestor;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ItemRequest that = (ItemRequest) o;
-        return id.equals(that.id) && Objects.equals(requestor, that.requestor);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, requestor);
-    }
+    @Transient
+    List<Item> items;
 }

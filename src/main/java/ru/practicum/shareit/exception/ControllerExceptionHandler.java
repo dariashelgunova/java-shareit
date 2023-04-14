@@ -52,6 +52,12 @@ public class ControllerExceptionHandler {
         return buildErrorResponse(BAD_REQUEST, ex.getMessage());
     }
 
+    @ExceptionHandler(InvalidPageParametersException.class)
+    public ResponseEntity<ErrorDetails> handleInvalidPageParametersException(InvalidPageParametersException ex) {
+        log.debug(String.valueOf(ex));
+        return buildErrorResponse(BAD_REQUEST, ex.getMessage());
+    }
+
     @ExceptionHandler(value = Throwable.class)
     public ResponseEntity<ErrorDetails> handleUncheckedException(Throwable ex) {
         log.debug(String.valueOf(ex));

@@ -1,23 +1,23 @@
-package ru.practicum.shareit.item.dto;
+package ru.practicum.shareit.request.dto;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import ru.practicum.shareit.item.comment.dto.CommentSimpleDto;
+import ru.practicum.shareit.item.dto.ItemRequestDto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ItemDtoWithComments {
+public class ItemRequestToReturnDto {
     Long id;
-    String name;
     String description;
-    Boolean available;
-    List<CommentSimpleDto> comments;
-}
+    LocalDateTime created;
+    List<ItemRequestDto> items;
 
+}

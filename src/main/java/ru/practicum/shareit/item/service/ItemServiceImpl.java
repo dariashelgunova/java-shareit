@@ -3,7 +3,6 @@ package ru.practicum.shareit.item.service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +16,8 @@ import ru.practicum.shareit.item.comment.model.Comment;
 import ru.practicum.shareit.item.comment.repo.CommentRepo;
 import ru.practicum.shareit.item.comment.service.CommentService;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.repo.db.ItemRepo;
+import ru.practicum.shareit.item.repo.ItemRepo;
+import ru.practicum.shareit.pageable.OffsetBasedPageRequest;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -33,7 +33,6 @@ import static java.util.stream.Collectors.*;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@Slf4j
 public class ItemServiceImpl implements ItemService {
     ItemRepo itemRepo;
     UserService userService;
@@ -77,8 +76,8 @@ public class ItemServiceImpl implements ItemService {
         itemRepo.deleteAll();
     }
 
-    public List<Item> findItemsByOwner(Long ownerId) {
-        List<Item> result = itemRepo.findByOwnerId(ownerId);
+    public List<Item> findItemsByOwner(Long ownerId, Integer from, Integer size) {
+        List<Item> result = itemRepo.findByOwnerId(ownerId, new OffsetBasedPageRequest(size, from, null));
         if (result.isEmpty()) {
             throw new NotFoundObjectException("По вашему запросу ничего найдено.");
         } else {
@@ -86,9 +85,9 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
-    public List<Item> findItemsBySearch(String requestText) {
+    public List<Item> findItemsBySearch(String requestText, Integer from, Integer size) {
         if (StringUtils.isBlank(requestText)) return Collections.emptyList();
-        List<Item> result = itemRepo.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailable(requestText, requestText, true);
+        List<Item> result = itemRepo.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailable(requestText, requestText, true, new OffsetBasedPageRequest(size, from, null));
         if (result.isEmpty()) {
             throw new NotFoundObjectException("По вашему запросу ничего найдено.");
         } else {
@@ -169,6 +168,14 @@ public class ItemServiceImpl implements ItemService {
         }
 
         return itemsByOwner;
+    }
+
+    public List<Item> findItemsByRequestId(Long requestId) {
+        return itemRepo.findByRequestId(requestId);
+    }
+
+    public List<Item> findItemsByRequestIds(List<Long> requestIds) {
+        return itemRepo.findByRequestIdIn(requestIds);
     }
 
 }

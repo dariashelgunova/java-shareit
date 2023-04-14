@@ -14,6 +14,7 @@ import ru.practicum.shareit.exception.ApproveBookingException;
 import ru.practicum.shareit.exception.AvailabilityException;
 import ru.practicum.shareit.exception.NotFoundObjectException;
 import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.pageable.OffsetBasedPageRequest;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -79,13 +80,46 @@ public class BookingServiceImpl implements BookingService {
         return userId.equals(booking.getItem().getOwner().getId()) && booking.getStatus().equals(Status.APPROVED);
     }
 
-    public List<Booking> findBookingsByUser(Long userId, State state) {
-        List<Booking> result = getBookingsByStateForBooker(userId, state);
+    public List<Booking> findBookingsByUser(Long userId, State state, Integer from, Integer size) {
+        List<Booking> result = getBookingsByStateForBooker(userId, state, size, from);
         if (result.isEmpty()) {
             throw new NotFoundObjectException("По вашему запросу ничего найдено.");
         } else {
             return result;
         }
+    }
+
+    private List<Booking> getBookingsByStateForBooker(Long userId, State state, int size, int from) {
+        List<Booking> result = new ArrayList<>();
+        LocalDateTime currentTime = LocalDateTime.from(LocalDateTime.now());
+        Sort sort = Sort.by(Sort.Direction.DESC, "start");
+
+        switch (state) {
+            case CURRENT:
+                result = bookingRepo.findByBookerIdAndStartLessThanEqualAndEndGreaterThanEqual(userId, currentTime, currentTime, new OffsetBasedPageRequest(size, from, sort));
+                break;
+
+            case FUTURE:
+                result = bookingRepo.findByBookerIdAndStartGreaterThanEqual(userId, currentTime, new OffsetBasedPageRequest(size, from, sort));
+                break;
+
+            case PAST:
+                result = bookingRepo.findByBookerIdAndEndLessThanEqual(userId, currentTime, new OffsetBasedPageRequest(size, from, sort));
+                break;
+
+            case REJECTED:
+                result = bookingRepo.findByBookerIdAndStatus(userId, Status.REJECTED, new OffsetBasedPageRequest(size, from, sort));
+                break;
+
+            case WAITING:
+                result = bookingRepo.findByBookerIdAndStatus(userId, Status.WAITING, new OffsetBasedPageRequest(size, from, sort));
+                break;
+
+            case ALL:
+                result = bookingRepo.findByBookerId(userId, new OffsetBasedPageRequest(size, from, sort));
+                break;
+        }
+        return result;
     }
 
     public List<Booking> findBookingsByUserForComment(Long userId, State state, Long itemId) {
@@ -102,8 +136,8 @@ public class BookingServiceImpl implements BookingService {
         return result;
     }
 
-    public List<Booking> findBookingsByOwner(Long userId, State state) {
-        List<Booking> result = getBookingsByStateForOwner(userId, state);
+    public List<Booking> findBookingsByOwner(Long userId, State state, Integer from, Integer size) {
+        List<Booking> result = getBookingsByStateForOwner(userId, state, size, from);
         if (result.isEmpty()) {
             throw new NotFoundObjectException("По вашему запросу ничего найдено.");
         } else {
@@ -116,67 +150,34 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new NotFoundObjectException("Объект не был найден"));
     }
 
-    private List<Booking> getBookingsByStateForOwner(Long userId, State state) {
+    private List<Booking> getBookingsByStateForOwner(Long userId, State state, int size, int from) {
         List<Booking> result = new ArrayList<>();
         LocalDateTime currentTime = LocalDateTime.from(LocalDateTime.now());
         Sort sort = Sort.by(Sort.Direction.DESC, "start");
 
         switch (state) {
             case CURRENT:
-                result = bookingRepo.findByItemOwnerIdAndStartLessThanEqualAndEndGreaterThanEqual(userId, currentTime, currentTime, sort);
+                result = bookingRepo.findByItemOwnerIdAndStartLessThanEqualAndEndGreaterThanEqual(userId, currentTime, currentTime, new OffsetBasedPageRequest(size, from, sort));
                 break;
 
             case FUTURE:
-                result = bookingRepo.findByItemOwnerIdAndStartGreaterThanEqual(userId, currentTime, sort);
+                result = bookingRepo.findByItemOwnerIdAndStartGreaterThanEqual(userId, currentTime, new OffsetBasedPageRequest(size, from, sort));
                 break;
 
             case PAST:
-                result = bookingRepo.findByItemOwnerIdAndEndLessThanEqual(userId, currentTime, sort);
+                result = bookingRepo.findByItemOwnerIdAndEndLessThanEqual(userId, currentTime, new OffsetBasedPageRequest(size, from, sort));
                 break;
 
             case REJECTED:
-                result = bookingRepo.findByItemOwnerIdAndStatus(userId, Status.REJECTED, sort);
+                result = bookingRepo.findByItemOwnerIdAndStatus(userId, Status.REJECTED, new OffsetBasedPageRequest(size, from, sort));
                 break;
 
             case WAITING:
-                result = bookingRepo.findByItemOwnerIdAndStatus(userId, Status.WAITING, sort);
+                result = bookingRepo.findByItemOwnerIdAndStatus(userId, Status.WAITING, new OffsetBasedPageRequest(size, from, sort));
                 break;
 
             case ALL:
-                result = bookingRepo.findByItemOwnerIdOrderByStartDesc(userId);
-                break;
-        }
-        return result;
-    }
-
-    private List<Booking> getBookingsByStateForBooker(Long userId, State state) {
-        List<Booking> result = new ArrayList<>();
-        LocalDateTime currentTime = LocalDateTime.from(LocalDateTime.now());
-        Sort sort = Sort.by(Sort.Direction.DESC, "start");
-
-        switch (state) {
-            case CURRENT:
-                result = bookingRepo.findByBookerIdAndStartLessThanEqualAndEndGreaterThanEqual(userId, currentTime, currentTime, sort);
-                break;
-
-            case FUTURE:
-                result = bookingRepo.findByBookerIdAndStartGreaterThanEqual(userId, currentTime, sort);
-                break;
-
-            case PAST:
-                result = bookingRepo.findByBookerIdAndEndLessThanEqual(userId, currentTime, sort);
-                break;
-
-            case REJECTED:
-                result = bookingRepo.findByBookerIdAndStatus(userId, Status.REJECTED, sort);
-                break;
-
-            case WAITING:
-                result = bookingRepo.findByBookerIdAndStatus(userId, Status.WAITING, sort);
-                break;
-
-            case ALL:
-                result = bookingRepo.findByBookerIdOrderByStartDesc(userId);
+                result = bookingRepo.findByItemOwnerId(userId, new OffsetBasedPageRequest(size, from, sort));
                 break;
         }
         return result;

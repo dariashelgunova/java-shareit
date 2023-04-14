@@ -1,12 +1,11 @@
 package ru.practicum.shareit.item.mapper;
 
 import lombok.experimental.UtilityClass;
-import ru.practicum.shareit.item.comment.model.Comment;
 import ru.practicum.shareit.item.dto.ItemDtoForOwner;
-import ru.practicum.shareit.item.dto.ItemDtoWithComments;
 import ru.practicum.shareit.item.dto.ItemRequestDto;
 import ru.practicum.shareit.item.dto.ItemSimpleDto;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.model.ItemRequest;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,7 +16,7 @@ import static ru.practicum.shareit.item.comment.mapper.CommentMapper.toCommentSi
 @UtilityClass
 public class ItemMapper {
 
-    public static Item fromItemRequestDto(ItemRequestDto itemRequestDto) {
+    public static Item fromItemRequestDto(ItemRequestDto itemRequestDto, ItemRequest request) {
         if (itemRequestDto == null) return null;
 
         Item item = new Item();
@@ -25,6 +24,7 @@ public class ItemMapper {
         item.setName(itemRequestDto.getName());
         item.setDescription(itemRequestDto.getDescription());
         item.setAvailable(itemRequestDto.getAvailable());
+        item.setRequest(request);
 
         return item;
     }
@@ -37,6 +37,9 @@ public class ItemMapper {
         itemRequestDto.setName(item.getName());
         itemRequestDto.setDescription(item.getDescription());
         itemRequestDto.setAvailable(item.getAvailable());
+        if (item.getRequest() != null) {
+            itemRequestDto.setRequestId(item.getRequest().getId());
+        }
 
         return itemRequestDto;
     }
@@ -48,19 +51,6 @@ public class ItemMapper {
                 .stream()
                 .map(ItemMapper::toItemRequestDto)
                 .collect(Collectors.toList());
-    }
-
-    public static ItemDtoWithComments toItemDtoWithComments(Item item, List<Comment> comments) {
-        if (item == null) return null;
-
-        ItemDtoWithComments itemDto = new ItemDtoWithComments();
-        itemDto.setId(item.getId());
-        itemDto.setName(item.getName());
-        itemDto.setDescription(item.getDescription());
-        itemDto.setAvailable(item.getAvailable());
-        itemDto.setComments(toCommentSimpleDtoList(comments));
-
-        return itemDto;
     }
 
     public static ItemDtoForOwner toItemDtoForOwner(Item item) {
@@ -96,14 +86,4 @@ public class ItemMapper {
 
         return itemDto;
     }
-
-    public static List<ItemSimpleDto> toItemSimpleDtoList(List<Item> items) {
-        if (items == null) return null;
-
-        return items
-                .stream()
-                .map(ItemMapper::toItemSimpleDto)
-                .collect(Collectors.toList());
-    }
-
 }

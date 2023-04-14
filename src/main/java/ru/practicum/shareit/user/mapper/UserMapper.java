@@ -50,15 +50,4 @@ public class UserMapper {
 
         return userRequestDto;
     }
-
-    public static List<UserSimpleDto> toUserSimpleDto(List<User> users) {
-        if (users == null) return null;
-
-        return users
-                .stream()
-                .map(UserMapper::toUserSimpleDto)
-                .collect(Collectors.toList());
-    }
-
-
 }

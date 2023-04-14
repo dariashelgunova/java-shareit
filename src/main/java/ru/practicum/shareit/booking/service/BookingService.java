@@ -16,11 +16,11 @@ public interface BookingService {
 
     boolean checkAccessForItemLastNextBookingByUserId(Booking booking, Long userId);
 
-    List<Booking> findBookingsByUser(Long userId, State state);
+    List<Booking> findBookingsByUser(Long userId, State state, Integer from, Integer size);
 
     List<Booking> findBookingsByUserForComment(Long userId, State state, Long itemId);
 
-    List<Booking> findBookingsByOwner(Long userId, State state);
+    List<Booking> findBookingsByOwner(Long userId, State state, Integer from, Integer size);
 
     Booking findLastBookingByItemId(Long itemId);
 
