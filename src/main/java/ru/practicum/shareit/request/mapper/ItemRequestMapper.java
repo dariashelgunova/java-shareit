@@ -26,25 +26,6 @@ public class ItemRequestMapper {
         return itemRequest;
     }
 
-    public static ItemRequestRequestDto toItemRequestRequestDto(ItemRequest itemRequest) {
-        if (itemRequest == null) return null;
-
-        ItemRequestRequestDto itemRequestRequestDto = new ItemRequestRequestDto();
-        itemRequestRequestDto.setId(itemRequest.getId());
-        itemRequestRequestDto.setDescription(itemRequest.getDescription());
-
-        return itemRequestRequestDto;
-    }
-
-    public static List<ItemRequestRequestDto> toItemRequestRequestDtoList(List<ItemRequest> itemRequests) {
-        if (itemRequests == null) return null;
-
-        return itemRequests
-                .stream()
-                .map(ItemRequestMapper::toItemRequestRequestDto)
-                .collect(Collectors.toList());
-    }
-
     public static ItemRequestToReturnDto toItemRequestToReturnDto(ItemRequest itemRequest) {
         if (itemRequest == null) return null;
 

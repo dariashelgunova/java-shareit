@@ -112,7 +112,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private Item changeItemFields(Item oldItem, Item newItem) {
-        if (newItem.getName() != null && !newItem.getName().isBlank()) { // TODO: 08.04.2023 StringUtils.isBlank?
+        if (newItem.getName() != null && !newItem.getName().isBlank()) {
             oldItem.setName(newItem.getName());
         }
         if (newItem.getDescription() != null && !newItem.getDescription().isBlank()) {

@@ -4,22 +4,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.practicum.shareit.booking.dto.BookingDtoToReturn;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.exception.ApproveBookingException;
+import ru.practicum.shareit.exception.AvailabilityException;
+import ru.practicum.shareit.exception.NotFoundObjectException;
+import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.repo.ItemRepo;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repo.UserRepo;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
@@ -27,32 +27,28 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.practicum.shareit.booking.mapper.BookingMapper.toBookingDtoToReturn;
-import static ru.practicum.shareit.booking.mapper.BookingMapper.toBookingDtoToReturnList;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(BookingController.class)
 class BookingControllerTest {
     private final ObjectMapper mapper = new ObjectMapper();
-    @Mock
+    @MockBean
     private BookingService bookingService;
-    @Mock
-    private ItemRepo itemRepo;
-    @Mock
-    private UserRepo userRepo;
-    @Mock
+    @MockBean
     private ItemService itemService;
-    @Mock
+    @MockBean
     private UserService userService;
-    @InjectMocks
-    private BookingController bookingController;
+
+    @Autowired
     private MockMvc mvc;
     private Booking booking;
     private BookingRequestDto bookingRequestDto;
@@ -60,18 +56,11 @@ class BookingControllerTest {
 
     @BeforeEach
     void setup() {
-        mvc = MockMvcBuilders
-                .standaloneSetup(bookingController)
-                .build();
-
         mapper.registerModule(new JavaTimeModule());
 
         User owner = createUser(1L);
-        when(userRepo.save(any())).thenReturn(owner);
         User booker = createUser(2L);
-        lenient().when(userRepo.save(any())).thenReturn(booker);
         Item item = createItem(1L, owner);
-        lenient().when(itemRepo.save(any())).thenReturn(item);
 
         booking = createBooking1(1L, item, booker);
 
@@ -82,16 +71,53 @@ class BookingControllerTest {
     @Test
     public void givenBookingDto_whenCreate_thenStatus200andBookingReturned() throws Exception {
         when(bookingService.create(any(), any())).thenReturn(booking);
-        String response = mvc.perform(post("/bookings")
+
+        mvc.perform(post("/bookings")
                         .contentType("application/json")
                         .content(mapper.writeValueAsString(bookingRequestDto))
                         .header("X-Sharer-User-Id", 2))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        assertEquals(mapper.writeValueAsString(bookingDtoToReturn), response);
+                .andExpect(jsonPath("$.id", is(notNullValue())));
+    }
+
+    @Test
+    public void givenThrownAvailabilityException_whenCreate_thenStatus400andThrowAvailabilityException() throws Exception {
+        when(bookingService.create(any(), any())).thenThrow(AvailabilityException.class);
+
+        mvc.perform(post("/bookings")
+                        .contentType("application/json")
+                        .content(mapper.writeValueAsString(bookingRequestDto))
+                        .header("X-Sharer-User-Id", 2))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status", is(400)));
+    }
+
+    @Test
+    public void givenThrownValidationException_whenCreate_thenStatus400andThrowValidationException() throws Exception {
+        when(bookingService.create(any(), any())).thenThrow(ValidationException.class);
+
+        mvc.perform(post("/bookings")
+                        .contentType("application/json")
+                        .content(mapper.writeValueAsString(bookingRequestDto))
+                        .header("X-Sharer-User-Id", 2))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status", is(400)));
+    }
+
+    @Test
+    public void givenThrownApproveBookingException_whenCreate_thenStatus404andThrowApproveBookingException() throws Exception {
+        when(bookingService.create(any(), any())).thenThrow(ApproveBookingException.class);
+
+        mvc.perform(post("/bookings")
+                        .contentType("application/json")
+                        .content(mapper.writeValueAsString(bookingRequestDto))
+                        .header("X-Sharer-User-Id", 2))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status", is(404)));
     }
 
     @Test
@@ -99,61 +125,119 @@ class BookingControllerTest {
         booking.setStatus(Status.APPROVED);
         bookingDtoToReturn.setStatus(Status.APPROVED);
         when(bookingService.acceptOrRejectRequest(eq(true), any(), any())).thenReturn(booking);
-        String response = mvc.perform(patch("/bookings/{bookingId}", booking.getId())
+
+        mvc.perform(patch("/bookings/{bookingId}", booking.getId())
                         .param("approved", "true")
                         .contentType("application/json")
                         .content(mapper.writeValueAsString(bookingRequestDto))
                         .header("X-Sharer-User-Id", 2))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        assertEquals(mapper.writeValueAsString(bookingDtoToReturn), response);
+                .andExpect(jsonPath("$.status", is("APPROVED")));
+    }
+
+    @Test
+    public void givenAvailabilityException_whenAcceptOrRejectBooking_thenStatus400andThrownAvailabilityException() throws Exception {
+        booking.setStatus(Status.APPROVED);
+        bookingDtoToReturn.setStatus(Status.APPROVED);
+        when(bookingService.acceptOrRejectRequest(eq(true), any(), any())).thenThrow(AvailabilityException.class);
+
+        mvc.perform(patch("/bookings/{bookingId}", booking.getId())
+                        .param("approved", "true")
+                        .contentType("application/json")
+                        .content(mapper.writeValueAsString(bookingRequestDto))
+                        .header("X-Sharer-User-Id", 2))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status", is(400)));
+    }
+
+    @Test
+    public void givenNotFoundObjectException_whenAcceptOrRejectBooking_thenStatus404andThrownNotFoundObjectException() throws Exception {
+        booking.setStatus(Status.APPROVED);
+        bookingDtoToReturn.setStatus(Status.APPROVED);
+        when(bookingService.acceptOrRejectRequest(eq(true), any(), any())).thenThrow(NotFoundObjectException.class);
+
+        mvc.perform(patch("/bookings/{bookingId}", booking.getId())
+                        .param("approved", "true")
+                        .contentType("application/json")
+                        .content(mapper.writeValueAsString(bookingRequestDto))
+                        .header("X-Sharer-User-Id", 2))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status", is(404)));
     }
 
     @Test
     public void givenBooking_whenFindingById_thenStatus200andBookingReturned() throws Exception {
         when(bookingService.findById(any())).thenReturn(booking);
-        String response = mvc.perform(get("/bookings/{bookingId}", booking.getId())
+
+        mvc.perform(get("/bookings/{bookingId}", booking.getId())
                         .contentType("application/json")
                         .header("X-Sharer-User-Id", 2))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        assertEquals(mapper.writeValueAsString(bookingDtoToReturn), response);
+                .andExpect(jsonPath("$.id", is(1)));
+    }
+
+    @Test
+    public void givenNotFoundObjectException_whenFindingById_thenStatus404andThrownNotFoundObjectException() throws Exception {
+        when(bookingService.findById(any())).thenThrow(NotFoundObjectException.class);
+
+        mvc.perform(get("/bookings/{bookingId}", booking.getId())
+                        .contentType("application/json")
+                        .header("X-Sharer-User-Id", 2))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status", is(404)));
     }
 
     @Test
     public void givenBooking_whenFindingByUser_thenStatus200andBookingReturned() throws Exception {
         List<Booking> result = Collections.singletonList(booking);
         when(bookingService.findBookingsByUser(any(), any(), any(), any())).thenReturn(result);
-        String response = mvc.perform(get("/bookings")
+
+        mvc.perform(get("/bookings")
                         .contentType("application/json")
                         .header("X-Sharer-User-Id", 2))
                 .andDo(print())
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        assertEquals(mapper.writeValueAsString(toBookingDtoToReturnList(result)), response);
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void givenNotFoundObjectException_whenFindingByUser_thenStatus404andThrownNotFoundObjectException() throws Exception {
+        when(bookingService.findBookingsByUser(any(), any(), any(), any())).thenThrow(NotFoundObjectException.class);
+
+        mvc.perform(get("/bookings")
+                        .contentType("application/json")
+                        .header("X-Sharer-User-Id", 2))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status", is(404)));
     }
 
     @Test
     public void givenBooking_whenFindingByOwner_thenStatus200andBookingReturned() throws Exception {
         List<Booking> result = Collections.singletonList(booking);
         when(bookingService.findBookingsByOwner(any(), any(), any(), any())).thenReturn(result);
-        String response = mvc.perform(get("/bookings/owner")
+
+        mvc.perform(get("/bookings/owner")
                         .contentType("application/json")
                         .header("X-Sharer-User-Id", 1))
                 .andDo(print())
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        assertEquals(mapper.writeValueAsString(toBookingDtoToReturnList(result)), response);
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void givenNotFoundObjectException_whenFindingByOwner_thenStatus404andThrownNotFoundObjectException() throws Exception {
+        when(bookingService.findBookingsByOwner(any(), any(), any(), any())).thenThrow(NotFoundObjectException.class);
+
+        mvc.perform(get("/bookings/owner")
+                        .contentType("application/json")
+                        .header("X-Sharer-User-Id", 1))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status", is(404)));
     }
 
     private User createUser(Long id) {

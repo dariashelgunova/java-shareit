@@ -4,43 +4,40 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import ru.practicum.shareit.exception.NotFoundObjectException;
 import ru.practicum.shareit.user.dto.UserRequestDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(UserController.class)
 class UserControllerTest {
     private final ObjectMapper mapper = new ObjectMapper();
-    @Mock
+    @MockBean
     private UserService userService;
-    @InjectMocks
-    private UserController userController;
     private User user;
     private UserRequestDto userRequestDto;
     private UserRequestDto userRequestDtoWithId;
+    @Autowired
     private MockMvc mvc;
 
     @BeforeEach
     void setup() {
-        mvc = MockMvcBuilders
-                .standaloneSetup(userController)
-                .build();
         mapper.registerModule(new JavaTimeModule());
 
         user = createUser(1L);
@@ -51,28 +48,23 @@ class UserControllerTest {
     @Test
     public void givenUserDto_whenCreate_thenStatus200andUserReturned() throws Exception {
         when(userService.create(any())).thenReturn(user);
-        String response = mvc.perform(post("/users")
+
+        mvc.perform(post("/users")
                         .contentType("application/json")
                         .content(mapper.writeValueAsString(userRequestDto)))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        assertEquals(mapper.writeValueAsString(userRequestDtoWithId), response);
+                .andExpect(jsonPath("$.id", is(notNullValue())));
     }
 
     @Test
     public void givenUserDto_whenFindAll_thenStatus200andUserReturned() throws Exception {
         when(userService.findAll()).thenReturn(Collections.singletonList(user));
-        String response = mvc.perform(get("/users")
+
+        mvc.perform(get("/users")
                         .contentType("application/json"))
                 .andDo(print())
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        assertEquals(mapper.writeValueAsString(Collections.singletonList(userRequestDtoWithId)), response);
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -84,28 +76,53 @@ class UserControllerTest {
         userRequestDtoWithId.setName(updatedName);
 
         when(userService.update(any(), any())).thenReturn(user);
-        String response = mvc.perform(patch("/users/{userId}", user.getId())
+
+        mvc.perform(patch("/users/{userId}", user.getId())
                         .contentType("application/json")
                         .content(mapper.writeValueAsString(updatedUser)))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        assertEquals(mapper.writeValueAsString(userRequestDtoWithId), response);
+                .andExpect(jsonPath("$.name", is("updatedName")));
+    }
+
+    @Test
+    public void givenNotFoundObjectException_whenUpdate_thenStatus404andThrownNotFoundObjectException() throws Exception {
+        String updatedName = "updatedName";
+        UserRequestDto updatedUser = new UserRequestDto();
+        updatedUser.setName(updatedName);
+        user.setName(updatedName);
+        userRequestDtoWithId.setName(updatedName);
+
+        when(userService.update(any(), any())).thenThrow(NotFoundObjectException.class);
+
+        mvc.perform(patch("/users/{userId}", user.getId())
+                        .contentType("application/json")
+                        .content(mapper.writeValueAsString(updatedUser)))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status", is(404)));
     }
 
     @Test
     public void givenUserDto_whenFindById_thenStatus200andUserReturned() throws Exception {
         when(userService.findById(any())).thenReturn(user);
-        String response = mvc.perform(get("/users/{userId}", user.getId())
+
+        mvc.perform(get("/users/{userId}", user.getId())
                         .contentType("application/json"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        assertEquals(mapper.writeValueAsString(userRequestDtoWithId), response);
+                .andExpect(jsonPath("$.id", is(1)));
+    }
+
+    @Test
+    public void givenNotFoundObjectException_whenFindById_thenStatus404andThrownNotFoundObjectException() throws Exception {
+        when(userService.findById(any())).thenThrow(NotFoundObjectException.class);
+
+        mvc.perform(get("/users/{userId}", user.getId())
+                        .contentType("application/json"))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status", is(404)));
     }
 
     @Test

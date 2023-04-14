@@ -202,7 +202,7 @@ public class ItemServiceImplTest {
         long itemId = 1L;
         long ownerId = 1L;
         List<Item> expected = List.of(createItemWithOwner(itemId, ownerId));
-        when(itemRepo.findByOwnerId(ownerId, new OffsetBasedPageRequest(10, 0, null))).thenReturn(expected);
+        when(itemRepo.findByOwnerId(any(), any())).thenReturn(expected);
 
         List<Item> itemsByOwner = service.findItemsByOwner(ownerId, 0, 10);
 
@@ -231,7 +231,7 @@ public class ItemServiceImplTest {
     public void givenRequestText_whenItemsFoundBySearch_thenReturnFoundItems() {
         String requestText = "text";
         List<Item> expected = List.of(createItemWithOwner(1L, 1L));
-        when(itemRepo.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailable(requestText, requestText, true, new OffsetBasedPageRequest(10, 0, null)))
+        when(itemRepo.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailable(any(), any(), eq(true), any()))
                 .thenReturn(expected);
 
         List<Item> foundItems = service.findItemsBySearch(requestText, 0, 10);

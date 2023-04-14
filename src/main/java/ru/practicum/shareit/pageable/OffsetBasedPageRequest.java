@@ -9,6 +9,7 @@ public class OffsetBasedPageRequest implements Pageable {
     private int limit;
     private int offset;
     private Sort sort;
+
     public OffsetBasedPageRequest(int limit, int offset, Sort sort) {
         if (limit < 1) {
             throw new IllegalArgumentException("Limit must not be less than one!");
@@ -38,14 +39,17 @@ public class OffsetBasedPageRequest implements Pageable {
     public int getPageNumber() {
         return offset / limit;
     }
+
     @Override
     public int getPageSize() {
         return limit;
     }
+
     @Override
     public long getOffset() {
         return offset;
     }
+
     @Override
     public Sort getSort() {
         return sort;
@@ -58,18 +62,19 @@ public class OffsetBasedPageRequest implements Pageable {
 
     @Override
     public Pageable next() {
-        // Typecast possible because number of entries cannot be bigger than integer (primary key is integer)
         return new OffsetBasedPageRequest(getPageSize(), (int) (getOffset() + getPageSize()), sort);
     }
+
     public Pageable previous() {
-        // The integers are positive. Subtracting does not let them become bigger than integer.
         return hasPrevious() ?
-                new OffsetBasedPageRequest(getPageSize(), (int) (getOffset() - getPageSize()), sort): this;
+                new OffsetBasedPageRequest(getPageSize(), (int) (getOffset() - getPageSize()), sort) : this;
     }
+
     @Override
     public Pageable previousOrFirst() {
         return hasPrevious() ? previous() : first();
     }
+
     @Override
     public Pageable first() {
         return new OffsetBasedPageRequest(getPageSize(), 0, sort);
