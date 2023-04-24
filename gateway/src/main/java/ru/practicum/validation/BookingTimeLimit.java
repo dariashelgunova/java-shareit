@@ -10,7 +10,9 @@ import java.lang.annotation.*;
 @Documented
 public @interface BookingTimeLimit {
     String message() default "Старт не может ровняться окончанию бронирования!";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }
 
