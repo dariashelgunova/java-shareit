@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.user.client.UserClient;
@@ -12,7 +13,7 @@ import ru.practicum.validation.Create;
 import ru.practicum.validation.Update;
 
 
-@RestController
+@Controller
 @RequiredArgsConstructor
 @RequestMapping(path = "/users")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

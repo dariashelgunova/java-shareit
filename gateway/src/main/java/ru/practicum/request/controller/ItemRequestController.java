@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.request.client.ItemRequestClient;
@@ -15,7 +16,7 @@ import javax.validation.constraints.PositiveOrZero;
 
 
 @Validated
-@RestController
+@Controller
 @RequiredArgsConstructor
 @RequestMapping(path = "/requests")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

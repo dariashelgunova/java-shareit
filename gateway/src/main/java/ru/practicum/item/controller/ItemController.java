@@ -4,7 +4,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.item.client.ItemClient;
@@ -16,9 +18,10 @@ import ru.practicum.validation.Update;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
+import java.util.Collections;
 
 @Validated
-@RestController
+@Controller
 @RequiredArgsConstructor
 @RequestMapping("/items")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -67,6 +70,9 @@ public class ItemController {
                                                     @Positive @RequestParam(defaultValue = "10") Integer size,
                                                     @RequestParam String text,
                                                     @RequestHeader("X-Sharer-User-Id") Long userId) {
+        if (text.isBlank()) {
+            return new ResponseEntity<Object>(Collections.EMPTY_LIST, HttpStatus.OK);
+        }
         return itemClient.findItemsBySearch(from, size, text, userId);
     }
 

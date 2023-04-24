@@ -3,9 +3,6 @@ package ru.practicum.exception;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
 
-import javax.validation.ConstraintViolationException;
-import javax.validation.ValidationException;
-
 import static java.util.Objects.requireNonNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -13,14 +10,6 @@ class ControllerExceptionHandlerTest {
 
     ControllerExceptionHandler handler = new ControllerExceptionHandler();
 
-    @Test
-    void handleValidationException() {
-        String message = "message";
-
-        ResponseEntity<ErrorDetails> response = handler.handleValidationException(new ValidationException(message));
-
-        assertEquals(message, requireNonNull(response.getBody()).getError());
-    }
 
     @Test
     void handleOwnValidationException() {
@@ -55,16 +44,6 @@ class ControllerExceptionHandlerTest {
         String message = "message";
 
         ResponseEntity<ErrorDetails> response = handler.handleUniversalException(new UniversalException(message));
-
-        assertEquals(message, requireNonNull(response.getBody()).getError());
-    }
-
-    @Test
-    void handleConstraintViolationException() {
-        String message = "message";
-
-        ResponseEntity<ErrorDetails> response = handler.handleConstraintViolationException(
-                new ConstraintViolationException(message, null));
 
         assertEquals(message, requireNonNull(response.getBody()).getError());
     }

@@ -7,7 +7,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import javax.validation.ConstraintViolationException;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.*;
@@ -15,12 +14,6 @@ import static org.springframework.http.HttpStatus.*;
 @Slf4j
 @RestControllerAdvice
 public class ControllerExceptionHandler {
-
-    @ExceptionHandler(value = javax.validation.ValidationException.class)
-    public ResponseEntity<ErrorDetails> handleValidationException(javax.validation.ValidationException ex) {
-        log.debug(String.valueOf(ex));
-        return buildErrorResponse(BAD_REQUEST, ex.getMessage());
-    }
 
     @ExceptionHandler(value = ValidationException.class)
     public ResponseEntity<ErrorDetails> handleOwnValidationException(ValidationException ex) {
@@ -44,12 +37,6 @@ public class ControllerExceptionHandler {
     public ResponseEntity<ErrorDetails> handleUniversalException(UniversalException ex) {
         log.debug(String.valueOf(ex));
         return buildErrorResponse(INTERNAL_SERVER_ERROR, ex.getMessage());
-    }
-
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorDetails> handleConstraintViolationException(ConstraintViolationException ex) {
-        log.debug(String.valueOf(ex));
-        return buildErrorResponse(BAD_REQUEST, ex.getMessage());
     }
 
     @ExceptionHandler(InvalidPageParametersException.class)

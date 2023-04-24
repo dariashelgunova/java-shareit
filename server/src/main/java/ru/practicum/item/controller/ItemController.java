@@ -18,7 +18,6 @@ import ru.practicum.request.service.ItemRequestService;
 import ru.practicum.user.model.User;
 import ru.practicum.user.service.UserService;
 
-import javax.validation.Valid;
 import java.util.List;
 
 import static ru.practicum.item.comment.mapper.CommentMapper.fromCommentRequestDto;
@@ -89,7 +88,7 @@ public class ItemController {
     @PostMapping("/{itemId}/comment")
     public CommentDtoToReturn createComment(@PathVariable("itemId") Long itemId,
                                             @RequestHeader("X-Sharer-User-Id") Long userId,
-                                            @Valid @RequestBody CommentRequestDto commentDto) {
+                                            @RequestBody CommentRequestDto commentDto) {
         Item item = itemService.findById(itemId);
         User author = userService.findById(userId);
         Comment newComment = fromCommentRequestDto(commentDto, item, author);
