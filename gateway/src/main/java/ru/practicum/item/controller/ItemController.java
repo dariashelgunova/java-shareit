@@ -21,7 +21,7 @@ import javax.validation.constraints.PositiveOrZero;
 import java.util.Collections;
 
 @Validated
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/items")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

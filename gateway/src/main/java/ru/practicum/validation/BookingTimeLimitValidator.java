@@ -20,6 +20,6 @@ public class BookingTimeLimitValidator implements ConstraintValidator<BookingTim
         if (start == null || end == null) {
             return false;
         }
-        return start.isEqual(end);
+        return !start.isEqual(end);
     }
 }

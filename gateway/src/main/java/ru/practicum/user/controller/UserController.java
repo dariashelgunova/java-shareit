@@ -13,7 +13,7 @@ import ru.practicum.validation.Create;
 import ru.practicum.validation.Update;
 
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/users")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
