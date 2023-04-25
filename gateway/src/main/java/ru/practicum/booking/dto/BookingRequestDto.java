@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.validation.BookingTimeLimit;
 
-import javax.validation.constraints.Future;
 import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -20,10 +19,7 @@ import java.time.LocalDateTime;
 public class BookingRequestDto {
     Long id;
     @FutureOrPresent(message = "Дата и время окончания не могут относиться к прошлому. Попробуйте еще раз.")
-    @NotNull(message = "Дата и время начала не могут быть пустыми. Попробуйте еще раз.")
     LocalDateTime start;
-    @Future(message = "Дата и время окончания не могут относиться к прошлому. Попробуйте еще раз.")
-    @NotNull(message = "Дата и время окончания не могут быть пустыми. Попробуйте еще раз.")
     LocalDateTime end;
     @NotNull
     Long itemId;

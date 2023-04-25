@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -70,7 +69,7 @@ public class ItemController {
                                                     @RequestParam String text,
                                                     @RequestHeader("X-Sharer-User-Id") Long userId) {
         if (text.isBlank()) {
-            return new ResponseEntity<Object>(Collections.EMPTY_LIST, HttpStatus.OK);
+            return ResponseEntity.ok(Collections.EMPTY_LIST);
         }
         return itemClient.findItemsBySearch(from, size, text, userId);
     }
